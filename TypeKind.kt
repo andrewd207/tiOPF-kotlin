@@ -1,5 +1,6 @@
 package tiOPF
 
+import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.superclasses
 
@@ -10,6 +11,7 @@ enum class TypeKind {
     SHORT,
     BYTE,
     LONG,
+    DATE,
     BOOLEAN,
     FLOAT,
     DOUBLE,
@@ -27,6 +29,7 @@ fun classToTypeKind(kClass: KClass<*>): TypeKind{
         Short::class -> TypeKind.SHORT
         Byte::class -> TypeKind.BYTE
         Long::class -> TypeKind.LONG
+        Date::class -> TypeKind.DATE
         Boolean::class -> TypeKind.BOOLEAN
         Float::class -> TypeKind.FLOAT
         Double::class -> TypeKind.DOUBLE
