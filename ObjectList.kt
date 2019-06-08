@@ -1,6 +1,6 @@
 package tiOPF
 
-typealias PerObjectList = ObjectList<Object>
+typealias PerObjectList = ObjectList<*>
 //typealias PerObjList = ObjectList<Object>
 
 open class ObjectList<T: Object>: Object(), MutableCollection<T> {

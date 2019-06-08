@@ -3,10 +3,7 @@ package tiOPF
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KVisibility
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.full.primaryConstructor
-import kotlin.reflect.full.superclasses
+import kotlin.reflect.full.*
 import kotlin.reflect.jvm.isAccessible
 
 const val CErrorSettingProperty      = "Error setting property %s.%s Message %s"
@@ -70,11 +67,18 @@ fun <T>setObjectProperty(instance: Any, propName: String, value: T){
     if (property is KMutableProperty<*>)
         property.setter.call(value)
 }
+fun isPublishedProp(kClass: KClass<*>, propName: String): Boolean{
+    val property = kClass.declaredMemberProperties.find { it.name === propName }
+    property?: return false
 
-fun isPublishedProp(instance: Any, propName: String): Boolean{
+    return property.findAnnotation<Published>() != null
+
+}
+
+fun isPublicProp(instance: Any, propName: String): Boolean{
     val property = instance::class.declaredMemberProperties.find { it.name === propName }
     if (property != null)
-        return property.isAccessible
+        return property.visibility == KVisibility.PUBLIC
     return false
 }
 
