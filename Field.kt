@@ -4,6 +4,7 @@ import java.text.DateFormat
 import java.text.NumberFormat
 import java.util.*
 import kotlin.math.absoluteValue
+import kotlin.math.pow
 import kotlin.math.sign
 
 enum class NullValidation {
@@ -183,6 +184,62 @@ open class FieldInteger(owner: Object, nullValidation: NullValidation, val maxDi
     override fun clear() {
         super.clear()
         privAsInteger = 0
+    }
+
+
+}
+
+open class FieldFloat(owner: Object, nullValidation: NullValidation, precision: Int = 0): FieldAbs(owner, nullValidation){
+    private fun getEpsilonValue(precision: Int): Double{
+        return (-(precision+1.0).pow(10))*2
+    }
+    var precision: Int = precision
+        set(value) {
+            field = value
+            epsilon = getEpsilonValue(precision)
+        }
+    var epsilon: Double = 0.0
+    private var privValue: Double = getEpsilonValue(precision)
+    var asFloat: Double
+        get() = privValue
+        set(value) {
+            privValue = value
+            setValue()
+        }
+
+    override var asString: String
+        get() {
+            return if (isNull) ""
+            else "%.${precision}f".format(privValue)
+        }
+        set(value) {
+            asFloat =
+                if (value.isNotEmpty())
+                    value.toDouble()
+                else
+                    0.0
+
+        }
+
+    override fun equals(compareWith: FieldAbs): Boolean {
+        assert(testValid(compareWith, FieldFloat::class), { CTIErrorInvalidObject })
+        return isNull == compareWith.isNull && asFloat == (compareWith as FieldFloat).asFloat && compareWith.epsilon == epsilon
+    }
+
+    override fun assign(assignFrom: FieldAbs) {
+        assert(testValid(assignFrom, FieldFloat::class), { CTIErrorInvalidObject })
+        if (assignFrom.isNull)
+            isNull = true
+        else {
+            asFloat = (assignFrom as FieldFloat).asFloat
+            precision = assignFrom.precision
+            epsilon= assignFrom.epsilon
+        }
+    }
+
+    override fun clear() {
+        super.clear()
+        privValue = 0.0
     }
 
 
