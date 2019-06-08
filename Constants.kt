@@ -19,3 +19,6 @@ const val CDefaultMaxPoolSizeSingleUser = 1
 const val CPasswordMasked = "Password masked from view"
 const val CErrorInconsistentTableNames = "Inconsistent table names found in DBColMap"
 const val CErrorQueryReturnedMoreThanOneRow = "Query returned \"%d\" rows when 1 was expected"
+
+val CBoolTrueArray = arrayOf("true", "t", "y", "1")
+val CBoolFalseArray = arrayOf("false", "f", "n", "0")
