@@ -1,0 +1,64 @@
+package tiOPF
+
+import kotlin.reflect.KClass
+
+// complete
+
+// Adds an owned query object
+// Note: It is not necessary to manually lock and unlock DBConnections
+// from this level and below - ObjectVisitorController does this for you.
+// Adds a pooled database connection
+open class ObjectVisitor: Visitor() {
+    companion object {
+        fun visitorControllerClass(): KClass<VisitorController> {
+            return ObjectVisitorController::class as KClass<VisitorController>
+        }
+    }
+    override var visited: Object? = null
+    protected fun logQueryTiming(queryName: String, queryTime: Int, scanTime: Int){
+        val lClassName = this::class.simpleName
+        val classNames = arrayOf( "VisReadGRoupPK",
+            "VisReqdQueryPK",
+            "VisReadQueryDetail",
+            "VisReadParams",
+            "VisReadQueryByName")
+
+        if (classNames.contains(lClassName))
+            return
+
+        LOG(queryName.padEnd(20)+ ' '+ queryTime.toString().padEnd(7)+ scanTime.toString().padEnd(7), LogSeverity.lsQueryTiming)
+    }
+    var persistenceLayer: PersistenceLayer? = null
+    var database: Database? = null
+    var query: Query? = null
+        get() {
+            assert(field != null, {"Query not assigned"})
+            return field
+        }
+        set(value) {
+            assert(field == null, {"Query already assigned"} )
+            field = value
+        }
+
+    protected open fun init(){
+        // do nothing
+    }
+    protected open fun setupParams(){
+        // do nothing
+    }
+    protected open fun unInit(){
+        // do nothing
+    }
+    protected open fun final(visited: Object){
+        when (visited.objectState) {
+            Object.PerObjectState.Deleted -> {}
+            Object.PerObjectState.Delete -> visited.objectState = Object.PerObjectState.Deleted
+            else ->  visited.objectState = Object.PerObjectState.Clean
+        }
+
+    }
+
+
+
+
+}
