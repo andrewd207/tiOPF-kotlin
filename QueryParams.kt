@@ -20,7 +20,7 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
         return result as T?
     }
     protected open fun <T: QueryParamAbs>findCreateParamByName(name: String, type: KClass<T>): T{
-        var result = findParamByName(name) as T?
+        var result = findParamByName<T>(name)
         if (result == null) {
             result = type::primaryConstructor.call() as T
             result.name = name
@@ -30,17 +30,17 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
     }
 
     fun getParamIsNull(name: String): Boolean{
-        val param = findParamByName(name)
+        val param: QueryParamAbs? = findParamByName(name)
         return param == null || param.isNull
     }
     fun setParamIsNull(name: String, value: Boolean){
-        val param = findParamByName(name)
+        val param: QueryParamAbs? = findParamByName(name)
         param?.isNull = value
     }
 
     fun getParamAsString(name: String): String{
         val param =  findParamByName(name, QueryParamString::class)
-        assert(testValid(param, QueryParamAbs::class, { CTIErrorInvalidObject }))
+        assert(testValid(param, QueryParamAbs::class), { CTIErrorInvalidObject })
         return param!!.valueAsString
     }
     fun setParamAsString(name: String, value: String){
