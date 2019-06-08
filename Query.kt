@@ -81,9 +81,9 @@ abstract class Query: BaseObject() {
     abstract fun setFieldAsString(name: String, value: String)
     abstract fun getFieldAsFloat(name: String): Double
     abstract fun setFieldAsFloat(name: String, value: Double)
-    abstract fun getFieldAsBoolean(name: String): String
+    abstract fun getFieldAsBoolean(name: String): Boolean
     abstract fun setFieldAsBoolean(name: String, value: Boolean)
-    abstract fun getFieldAsInteger(name: String): String
+    abstract fun getFieldAsInteger(name: String): Long
     abstract fun setFieldAsInteger(name: String, value: Long)
     abstract fun getFieldAsDate(name: String): LocalDate
     abstract fun setFieldAsDate(name: String, value: LocalDate)
@@ -93,9 +93,9 @@ abstract class Query: BaseObject() {
     abstract fun setFieldAsString(index: Long, value: String)
     abstract fun getFieldAsFloat(index: Long): Double
     abstract fun setFieldAsFloat(index: Long, value: Double)
-    abstract fun getFieldAsBoolean(index: Long): String
+    abstract fun getFieldAsBoolean(index: Long): Boolean
     abstract fun setFieldAsBoolean(index: Long, value: Boolean)
-    abstract fun getFieldAsInteger(index: Long): String
+    abstract fun getFieldAsInteger(index: Long): Long
     abstract fun setFieldAsInteger(index: Long, value: Long)
     abstract fun getFieldAsDate(index: Long): LocalDate
     abstract fun setFieldAsDate(index: Long, value: LocalDate)
@@ -125,8 +125,8 @@ abstract class Query: BaseObject() {
     //abstract fun assignParamFromStream(name: String, stream: Stream<Char>)
     //abstract fun assignParamToStream(name: String, stream: Stream<Char>)
 
-    //abstract fun assignFieldAsStream(name: String, stream: Stream<Char>)
-    //abstract fun assignFieldAsStream(index: Long, stream: Stream<Char>)
+    abstract fun assignFieldAsByteArray(name: String, data: ValueOut<ByteArray>)
+    abstract fun assignFieldAsByteArray(index: Long, data: ValueOut<ByteArray>)
 
     open fun attachDatabase(database: Database){
         this.database = database

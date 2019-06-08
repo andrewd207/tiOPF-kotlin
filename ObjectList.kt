@@ -1,6 +1,9 @@
 package tiOPF
 
-open class ObjectList<T>: Object(), MutableCollection<T> {
+typealias PerObjectList = ObjectList<Object>
+//typealias PerObjList = ObjectList<Object>
+
+open class ObjectList<T: Object>: Object(), MutableCollection<T> {
     override val size: Int
         get() {return count()}
 

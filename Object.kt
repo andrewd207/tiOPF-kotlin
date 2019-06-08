@@ -140,6 +140,10 @@ open class Object(): Visited(), IObject<Object> {
         // TODO
     }
 
+    open fun isReadWriteProp(propName: String): Boolean{
+        return propName.equals("OID", true) || isReadWriteProp(this, propName)
+    }
+
     override fun clone(): Object{
         val result = this::class.primaryConstructor!!.call()
         result.assign(this)

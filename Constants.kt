@@ -12,6 +12,10 @@ const val CErrorCallToTIPerMgrWhileShuttingDown = "Call to tiPerMgr while shutti
 const val CErrorAttemptToRegisterDuplicateVisitor = "Attempt to register duplicate visitor %s";
 const val CErrorInvalidVisitorGroup = "Attempt to execute visitors for an unknown visitor group \"%s\"";
 
+const val CErrorInvalidQueryFieldKind    = "Invalid QueryFieldKind"
+const val CErrorInvalidQueryFieldKindStr = "Invalid QueryFieldKind <%s>"
+const val CErrorInvalidTtiQueryFieldKind = CErrorInvalidQueryFieldKind
+
 const val CDefaultMinPoolSize = 1
 const val CDefaultMaxPoolSizeMultiUser = 9999
 const val CDefaultMaxPoolSizeSingleUser = 1

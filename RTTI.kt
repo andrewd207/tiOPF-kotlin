@@ -36,6 +36,16 @@ fun getPropertyClass(klass: KClass<*>, propName: String): KClass<*> {
     return Any::class
 }
 
+fun getPropertyType(instance: Any, propName: String): TypeKind{
+    val klass = getPropertyClass(instance::class, propName)
+    return classToTypeKind(klass)
+}
+
+fun isReadWriteProp(instance: Any, propName: String): Boolean{
+    val prop = instance::class.declaredMemberProperties.find { it.name == propName } ?: return false
+    return prop is KMutableProperty<*>
+}
+
 fun getPropertyInheritsFrom(instance: Any, propName: String, klass: KClass<*>): Boolean {
 
     return getPropertyInheritsFrom(instance::class, propName, klass)
