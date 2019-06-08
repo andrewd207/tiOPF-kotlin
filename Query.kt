@@ -1,6 +1,6 @@
 package tiOPF
 
-import java.sql.Date
+import java.util.Date
 import java.time.LocalDate
 
 
@@ -67,8 +67,8 @@ abstract class Query: BaseObject() {
     abstract fun setParamAsFloat(name: String, value: Double)
     abstract fun getParamAsBoolean(name: String): Boolean
     abstract fun setParamAsBoolean(name: String, value: Boolean)
-    abstract fun getParamAsDate(name: String): LocalDate
-    abstract fun setParamAsDate(name: String, value: LocalDate)
+    abstract fun getParamAsDate(name: String): Date
+    abstract fun setParamAsDate(name: String, value: Date)
     abstract fun getParamAsTextBLOB(name: String): String
     abstract fun setParamAsTextBLOB(name: String, value: String)
     abstract fun getParamAsMacro(name: String): ByteArray

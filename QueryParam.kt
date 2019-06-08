@@ -1,6 +1,6 @@
 package tiOPF
 
-import java.time.LocalDate
+import java.text.DateFormat
 import java.util.*
 
 abstract class QueryParamAbs: Object() {
@@ -67,12 +67,12 @@ open class QueryParamFloat: QueryParamAbs() {
 }
 
 open class QueryParamDateTime: QueryParamAbs() {
-    private var valueDateTime: LocalDate = LocalDate.now()
+    private var valueDateTime: Date = Date()
     override val kind: Query.QueryFieldKind = Query.QueryFieldKind.DateTime
     override var valueAsString: String
         get() = valueDateTime.toString()
-        set(value) { valueDateTime = LocalDate.parse(value) ; isNull = false}
-    var valueAsDateTime: LocalDate
+        set(value) { valueDateTime = DateFormat.getInstance().parse(value) ; isNull = false}
+    var valueAsDateTime: Date
         get() = valueDateTime
         set(value) {
             valueDateTime = value
