@@ -20,7 +20,7 @@ open class VisAutoAbs: Visitor() {
             if (propName.contains("owner", true)){
                 if (this is VisAutoUpdateAbs) {
                     assert(data.owner != null, {"Attempting to read a collection but the collections's Visited.Owner is not assigned"})
-                    data.owner.oid.assignToQueryParam(colname, params)
+                    data.owner!!.oid.assignToQueryParam(colname, params)
                 }
                 else {
                     if (!data.oid.isNull())
