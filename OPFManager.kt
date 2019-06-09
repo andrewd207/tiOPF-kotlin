@@ -2,6 +2,7 @@ package tiOPF
 
 import java.time.ZonedDateTime
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.reflect.KClass
 
 var UOPFManager: OPFManager? = null
 var UShuttingDown: Boolean = false
@@ -55,11 +56,21 @@ class OPFManager: Object() {
                 privClassDBMappingManager = ClassDBMappingManager()
                 privClassDBMappingManager!!.owner = this
 
-                visitorManager.registerVisitor(CuStandardTask_ReadPK, VisAutoCollectionPKRead::class )
+                visitorManager.registerVisitor(CuStandardTask_ReadPK,   VisAutoCollectionPKRead::class as KClass<Visitor> )
+                visitorManager.registerVisitor(CuStandardTask_ReadThis, VisAutoReadThis::class as KClass<Visitor> )
+                visitorManager.registerVisitor(CuStandardTask_Read,     VisAutoReadThis::class as KClass<Visitor> )
+                visitorManager.registerVisitor(CuStandardTask_Read,     VisAutoCollectionRead::class as KClass<Visitor> )
+                visitorManager.registerVisitor(CuStandardTask_Save,     VisAutoDelete::class as KClass<Visitor> )
+                visitorManager.registerVisitor(CuStandardTask_Save,     VisAutoUpdate::class as KClass<Visitor> )
+                visitorManager.registerVisitor(CuStandardTask_Save,     VisAutoCreate::class as KClass<Visitor> )
             }
 
             return privClassDBMappingManager!!
         }
+
+    fun read(visited: Visited, dbConnectionName: String, persistanceLayerName: String = ""){
+        visitorManager.execute(CuStandardTask_Read, visited, dbConnectionName, persistenceLayerName)
+    }
 
     init {
 

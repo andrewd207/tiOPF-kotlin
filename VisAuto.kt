@@ -1,6 +1,7 @@
 package tiOPF
 // complete
 import kotlin.reflect.KClass
+import kotlin.reflect.full.createInstance
 
 abstract class VisAutoAbs: ObjectVisitor() {
     protected val whereAttrColMaps = AttrColMaps()
@@ -9,9 +10,9 @@ abstract class VisAutoAbs: ObjectVisitor() {
     protected val params = QueryParams()
 
     protected var visitedClassType: KClass<Object>? = null
-    override fun execute(visited: Visited) {
+    override fun execute(visited: Visited?) {
         super.execute(visited)
-        visitedClassType = visited::class as KClass<Object>
+        visitedClassType = visited!!::class as KClass<Object>
 
     }
 
@@ -152,7 +153,7 @@ open class VisAutoReadThis: VisAutoAbs(){
         }
     }
 
-    override fun execute(visited: Visited) {
+    override fun execute(visited: Visited?) {
         super.execute(visited)
         if (!acceptVisitor())
             return
@@ -393,7 +394,7 @@ abstract class VisAutoUpdateAbs: VisAutoAbs(){
         addToParams(params, attrColMaps, visited!!)
     }
     abstract fun doExecuteQuery()
-    override fun execute(visited: Visited) {
+    override fun execute(visited: Visited?) {
         super.execute(visited)
         if (!acceptVisitor())
             return

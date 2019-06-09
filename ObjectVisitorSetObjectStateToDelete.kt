@@ -6,7 +6,7 @@ class ObjectVisitorSetObjectStateToDelete: Visitor() {
         val lVisited = visited as Object
         val result = lVisited.objectState != Object.PerObjectState.Deleted
 
-        LOG(arrayOf(this::class.simpleName, visited::class.simpleName, result), Log.LogSeverity.lsAcceptVisitor)
+        LOG(arrayOf(this::class.simpleName, visited::class.simpleName, result), LogSeverity.lsAcceptVisitor)
         return result
     }
 

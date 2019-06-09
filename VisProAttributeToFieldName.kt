@@ -7,7 +7,7 @@ class VisProAttributeToFieldName(private val attrColMaps: AttrColMaps, private v
         return visited is SelectionCriteriaAbs
     }
 
-    override fun execute(visited: Visited) {
+    override fun execute(visited: Visited?) {
         super.execute(visited)
         if (!acceptVisitor())
             return

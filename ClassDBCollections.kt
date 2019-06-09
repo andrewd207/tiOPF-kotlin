@@ -5,7 +5,7 @@ import kotlin.reflect.KClass
 class ClassDBCollections: ObjectList<ClassDBCollection>() {
     val ownerAsClassDBMappingManager: ClassDBMappingManager get() = owner as ClassDBMappingManager
     fun addClassCollectionMapping(collectionClass: KClass<PerObjectList>, kClass: KClass<*>): ClassDBCollection{
-        val result = ClassDBCollection(collectionClass, kClass)
+        val result = ClassDBCollection(collectionClass, kClass as KClass<Object>)
         add(result)
         return result
     }

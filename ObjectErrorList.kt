@@ -14,7 +14,7 @@ class ObjectErrorList: ObjectList<ObjectError>() {
         addError("", errorMessage, 0)
     }
     fun findByMessage(message: String): ObjectError?{
-        items.forEach {
+        forEach {
             if (it.errorMessage.equals(message) )
                 return it
         }
@@ -22,7 +22,7 @@ class ObjectErrorList: ObjectList<ObjectError>() {
     }
 
     fun findByErrorCode(errorCode: Int): ObjectError?{
-        items.forEach {
+        forEach {
             if (it.errorCode == errorCode )
                 return it
         }
@@ -30,7 +30,7 @@ class ObjectErrorList: ObjectList<ObjectError>() {
     }
 
     fun findByErrorProperty(property: String): ObjectError?{
-        items.forEach {
+        forEach {
             if (it.errorProperty.equals(property) )
                 return it
         }
@@ -40,10 +40,10 @@ class ObjectErrorList: ObjectList<ObjectError>() {
     open val asString: String
         get() {
             var result = ""
-            for (item in items) {
+            forEach {
                 if (result.isNotEmpty())
                     result+= tiLineEnd()
-                result+= item.errorMessage
+                result+= it.errorMessage
             }
             return result
         }

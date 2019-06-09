@@ -23,13 +23,16 @@ open class DBMetadataTable: ObjectList<DBMetadataField>() {
         add(result)
         return result
     }
-    override fun read(dbConnectionName: String, persistanceName: String){
+    override fun read(dbConnectionName: String, persistenceName: String){
         if (objectState != PerObjectState.PK)
             return
 
         val database: Database = GTIOPFManager().persistanceLayers.lockDatabase(dbConnectionName, persistenceLayerName)
         try {
-            database?.
+            database!!.readMetadataFields(this)
+        }
+        finally {
+            GTIOPFManager().persistanceLayers.unlockDatabase(database, dbConnectionName, persistenceLayerName)
         }
 
     }

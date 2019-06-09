@@ -10,7 +10,7 @@ open class DBConnectionPool(protected val dbConnectionPools: DBConnectionPools, 
 
     override fun afterAddPooledItem(item: PooledItem) {
         val layer = dbConnectionPools.persistenceLayer
-        val database = layer.databaseClassCreate()
+        val database = layer.databaseClass.createInstance()
         database.connect(   dbConnectionParams.databaseName,
                             dbConnectionParams.userName,
                             dbConnectionParams.password,

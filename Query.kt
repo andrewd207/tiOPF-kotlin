@@ -52,10 +52,10 @@ abstract class Query: BaseObject() {
     open fun assignParams(params: QueryParams, where: QueryParams? = null){
         if (params != null)
             for (i in 0..params.count()-1)
-                params.items[i].assignToTIQuery(this)
+                params[i].assignToTIQuery(this)
         if (where != null)
             for (i in 0..where.count()-1)
-                where.items[i].assignToTIQuery(this)
+                where[i].assignToTIQuery(this)
     }
 
     // Params

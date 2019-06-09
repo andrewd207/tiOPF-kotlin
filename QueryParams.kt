@@ -149,7 +149,7 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
         assert(testValid(fieldMetadata, Object::class), { CTIErrorInvalidObject })
         assert(propName.isNotEmpty(), { "propName is not assigned"})
         assert(paramName.isNotEmpty(), { "paramName is not assigned"})
-        assert(isPublishedProp(fieldMetadata, propName), { "$propName is not a published property on ${fieldMetadata.className()}"})
+        assert(isPublishedProp(fieldMetadata::class, propName), { "$propName is not a published property on ${fieldMetadata.className()}"})
         try {
             when (classToTypeKind(getPropertyClass(fieldMetadata::class, propName))){
                 TypeKind.STRING -> {

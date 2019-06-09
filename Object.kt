@@ -1,7 +1,5 @@
 package tiOPF
 
-import com.sun.org.apache.xpath.internal.operations.Bool
-import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.primaryConstructor
 
@@ -68,7 +66,7 @@ open class Object(): Visited(), IObject<Object> {
 
             }
         }
-    open var dirty: Boolean = false
+    open var dirty: Boolean
         get() {
             val vis = VisPerObjIsDirty()
             this.iterate(vis)
@@ -80,10 +78,21 @@ open class Object(): Visited(), IObject<Object> {
             when (objectState) {
                 PerObjectState.Empty -> {
                     objectState = PerObjectState.Create
-                    if ()
+                    if (oid.isNull())
+                        oidGenerator().assignNextOID(oid)
                 }
+                PerObjectState.PK -> objectState = PerObjectState.Create
+                PerObjectState.Clean -> objectState = PerObjectState.Update
+                PerObjectState.Create,
+                PerObjectState.Update,
+                PerObjectState.Delete,
+                PerObjectState.Deleted -> { } // do nothing
+                else -> EtiOPFProgrammerException(CErrorInvalidObjectState)
             }
 
+        }
+        else {
+            objectState = PerObjectState.Clean
         }
     }
 
@@ -159,15 +168,38 @@ open class Object(): Visited(), IObject<Object> {
         assignPublishedProps(source)
     }
 
-    open fun read(dbConnectionName: String = "", persistanceName: String = "")
+    open fun read(dbConnectionName: String, persistenceLayerName: String = ""){
+        GTIOPFManager().visitorManager.execute(CuStandardTask_Read,this, dbConnectionName, persistenceLayerName)
+
+    }
     open fun read(){
         read("", "")
     }
+    open fun readPK(dbConnectionName: String, persistenceLayerName: String){
+        GTIOPFManager().visitorManager.execute(CuStandardTask_ReadPK,this, dbConnectionName, persistenceLayerName)
+    }
+
+
+    open fun readThis(dbConnectionName: String, persistenceLayerName: String){
+        GTIOPFManager().visitorManager.execute(CuStandardTask_ReadThis,this, dbConnectionName, persistenceLayerName)
+    }
+
+    open fun save(dbConnectionName: String, persistenceLayerName: String = ""){
+        GTIOPFManager().visitorManager.execute(CuStandardTask_Save,this, dbConnectionName, persistenceLayerName)
+    }
+    open fun save(){
+        save( "", "")
+    }
+
     open fun <T>getPropValue(propName: String): T?{
         if (propName.equals("oid", true))
             return oid.asString as T
         return getObjectProperty<Any>(this, propName) as T?
 
+    }
+
+    open fun stopObserving(){
+        // do nothing. child classes will implement
     }
 
     open fun <T>setPropValue(propName: String, value: T){

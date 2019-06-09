@@ -44,7 +44,7 @@ abstract class Database: BaseObject() {
     }
 
     abstract fun readMetadataTables(data: DBMetadata)
-    abstract fun readMetadataFields(data: DBMetadata)
+    abstract fun readMetadataFields(data: DBMetadataTable)
     open fun execSQL(sql: String, params: QueryParams){
         val query = createAndAttachQuery()
         val hadToStartTransaction = !inTransaction()

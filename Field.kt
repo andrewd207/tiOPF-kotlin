@@ -34,7 +34,7 @@ abstract class FieldAbs(private var owner: Object,
             if (privFieldName.isEmpty()){
                 assert(testValid(owner, Object::class), { CTIErrorInvalidObject})
                 val list = List<String>()
-                getPropertyNames(owner, list, arrayOf(TypeKind.OBJECT))
+                getPropertyNames(owner, list, setOf(TypeKind.OBJECT))
                 list.forEach {
                     if (getObjectProperty<Any>(this, it) == this){
                         privFieldName = it
