@@ -64,6 +64,17 @@ class ClassMaps: ObjectList<ClassMap>(){
         assert(classMap != null, {"Attempt to find parent on unregistered class <${kClass.qualifiedName}>"})
         return classMap
     }
+    fun findAllParents(kClass: KClass<Object>, list: ClassMaps){
+        assert(!list.ownsObjects, {"list.ownsObjects is true and it should be false"});
+        list.clear()
+        var classMap: ClassMap? = findByPerObjAbsClass(kClass)
+        assert(classMap != null, {"Request to find parent on class that is not registered<${kClass.qualifiedName}>"})
+        list.add(0, classMap!!)
+        while (classMap != null && classMap.parentClassMap != null){
+            classMap = classMap.parentClassMap
+            list.add(0, classMap!!)
+        }
+    }
     fun hasParent(kClass: KClass<Object>): Boolean{
         return findParent(kClass) != null
     }

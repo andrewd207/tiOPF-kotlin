@@ -62,7 +62,7 @@ open class Visitor: BaseObject() {
         return true
     }
     internal fun intVisitBranch(derivedParent: Visited?, visited: Visited): Boolean{
-        return visitBranch(derivedParent, visited
+        return visitBranch(derivedParent, visited)
     }
 
     open fun execute(visited: Visited){
