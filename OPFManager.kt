@@ -68,14 +68,5 @@ class OPFManager: Object() {
             return privClassDBMappingManager!!
         }
 
-    fun read(visited: Visited, dbConnectionName: String, persistanceLayerName: String = ""){
-        visitorManager.execute(CuStandardTask_Read, visited, dbConnectionName, persistenceLayerName)
-    }
-
-    init {
-
-    }
-
-
 
 }

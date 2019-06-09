@@ -62,7 +62,7 @@ open class VisitorManager(val manager: OPFManager): BaseObject() {
         LOG(logMessage, LogSeverity.lsVisitor)
         val visitors = List<Visitor>()
         val visitorMappingGroup = findVisitorMappingGroup(groupName)
-        visitorMappingGroup?: throw Exception(CErrorInvalidVisitorGroup.format(groupName))
+        visitorMappingGroup?: throw Exception(CErrorInvalidVisitorGroup.format(groupName)+ ". Registered count == "+visitorMappings.size)
         val visitorController = visitorMappingGroup.createControllerClassInstance(this, visitorControllerConfig)
         assignVisitorInstances(visitorMappingGroup, visitors)
 

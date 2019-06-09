@@ -216,4 +216,10 @@ open class Object(): Visited(), IObject<Object> {
         return list.size
     }
 
+    fun getProperties(propFilter: Set<TypeKind> = CTypeKindSimple): List<String>{
+        val result = List<String>()
+        getPropertyNames(this, result, propFilter)
+        return result
+    }
+
 }

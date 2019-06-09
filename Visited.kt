@@ -2,6 +2,8 @@ package tiOPF
 // complete
 import kotlin.reflect.KClass
 
+const val CErrorInvalidIterationStyle = "Invalid IterationStyle"
+
 typealias VisitedTouchMethod = (candidates: Visited, visitor: Visitor, list: TouchedByVisitorList, iterationDepth: Int) -> Unit
 
 open class Visited: BaseObject(){
@@ -56,8 +58,14 @@ open class Visited: BaseObject(){
         iterateAssignTouched(visitor, touchedByVisitorList)
     }
     protected open fun iterateAssignTouched(visitor: Visitor, touchedByVisitorList: TouchedByVisitorList){
-        val touchedByVisitorList = TouchedByVisitorList()
-        iterateAssignTouched(visitor, touchedByVisitorList)
+        when (visitor.iterationStyle){
+            Visitor.IterationStyle.isTopDownRecurse -> iterateTopDownRecurse(visitor, touchedByVisitorList)
+            Visitor.IterationStyle.isTopDownSinglePass -> iterateTopDownSinglePass(visitor, touchedByVisitorList)
+            Visitor.IterationStyle.isBottomUpSinglePass -> iterateBottomUpSinglePass(visitor, touchedByVisitorList)
+            else -> throw EtiOPFProgrammerException(CErrorInvalidIterationStyle)
+        }
+
+
 
     }
     protected open fun iterateRecurse(visitor: Visitor, derivedParent: Visited?, touchedByVisitorList: TouchedByVisitorList,
