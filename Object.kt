@@ -163,5 +163,19 @@ open class Object(): Visited(), IObject<Object> {
     open fun read(){
         read("", "")
     }
+    open fun <T>getPropValue(propName: String): T?{
+        if (propName.equals("oid", true))
+            return oid.asString as T
+        return getObjectProperty<Any>(this, propName) as T?
+
+    }
+
+    open fun <T>setPropValue(propName: String, value: T){
+        if (propName.equals("oid", true))
+            oid.asString = value as String
+        else
+          setObjectProperty(this, propName, value)
+
+    }
 
 }
