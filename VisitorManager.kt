@@ -1,4 +1,9 @@
 package tiOPF
+
+import kotlin.reflect.KClass
+import kotlin.reflect.full.companionObject
+import kotlin.reflect.full.companionObjectInstance
+
 // complete
 @Suppress("UNCHECKED_CAST")
 open class VisitorManager(val manager: OPFManager): BaseObject() {
@@ -9,13 +14,13 @@ open class VisitorManager(val manager: OPFManager): BaseObject() {
         return null
     }
     protected val visitorMappings = List<VisitorMappingGroup>()
-    fun registerVisitor(groupName: String, visitorClass: IVisitorClass) {
+    fun registerVisitor(groupName: String, visitorClass: KClass<Visitor>) {
 
         syncronizer.beginWrite()
         try {
             var visitorMappingGroup = findVisitorMappingGroup(groupName)
             if (visitorMappingGroup == null) {
-                visitorMappingGroup = VisitorMappingGroup(groupName, visitorClass.visitorControllerClass())
+                visitorMappingGroup = VisitorMappingGroup(groupName, getControllerClass(visitorClass))
                 visitorMappings.add(visitorMappingGroup)
             }
             visitorMappingGroup.add(visitorClass)
@@ -83,7 +88,7 @@ open class VisitorManager(val manager: OPFManager): BaseObject() {
         visitors.forEach {
             visitorController.beforeExecuteVisitor(it)
             try {
-                visited?.iterateAssignTouched(it, visitorController.touchedByVisitorList)
+                visited?.intIterateAssignTouched(it, visitorController.touchedByVisitorList)
                 visited?: it.execute(null)
             }
             finally {

@@ -52,6 +52,9 @@ open class Visited: BaseObject(){
             touchedByVisitorList.appendBottomUp(touchedObjectList)
         }
     }
+    internal fun intIterateAssignTouched(visitor: Visitor, touchedByVisitorList: TouchedByVisitorList){
+        iterateAssignTouched(visitor, touchedByVisitorList)
+    }
     protected open fun iterateAssignTouched(visitor: Visitor, touchedByVisitorList: TouchedByVisitorList){
         val touchedByVisitorList = TouchedByVisitorList()
         iterateAssignTouched(visitor, touchedByVisitorList)
@@ -97,7 +100,7 @@ open class Visited: BaseObject(){
         visitor.setDepth(visitedCandidate.iterationDepth)
         visitor.execute(visitedCandidate.visited)
     }
-    val terminated: Boolean get() = GTIOPFManager().terminated
+    private val terminated: Boolean get() = GTIOPFManager().terminated
     protected fun continueVisiting(visitor: Visitor): Boolean{
         return visitor.continueVisiting && !terminated
 

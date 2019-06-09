@@ -49,7 +49,7 @@ open class ObjectVisitor: Visitor() {
     protected open fun unInit(){
         // do nothing
     }
-    protected open fun final(visited: Object){
+    internal open fun final(visited: Object){
         when (visited.objectState) {
             Object.PerObjectState.Deleted -> {}
             Object.PerObjectState.Delete -> visited.objectState = Object.PerObjectState.Deleted

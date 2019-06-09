@@ -15,4 +15,28 @@ abstract class OIDStringAbs: OID() {
             return 1
         return 0
     }
+
+    override fun assignToQueryParam(fieldName: String, params: QueryParams) {
+        assert(params is QueryParams, { "query not QueryParams"})
+        params.setValueAsString(fieldName, asString)
+    }
+
+    override fun assignToQuery(fieldName: String, query: Query) {
+        if (isNull())
+            query.setParamIsNull(fieldName, true)
+        else
+            query.setParamAsString(fieldName, asString)
+    }
+
+    override fun assignFromQuery(fieldName: String, query: Query) {
+        asString = query.getFieldAsString(fieldName)
+    }
+
+    override fun equalsQueryField(fieldName: String, query: Query): Boolean {
+        return asString.equals(query.getFieldAsString(fieldName))
+    }
+
+    override fun assign(source: OID) {
+        asString = source.asString
+    }
 }

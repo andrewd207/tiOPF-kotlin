@@ -49,13 +49,13 @@ class OPFManager: Object() {
                 defaultPerLayer!!.defaultDBConnectionName = value
         }
     private var privClassDBMappingManager: ClassDBMappingManager? = null
-    val classDBMappingManager = ClassDBMappingManager()
+    val classDBMappingManager: ClassDBMappingManager
         get() {
             if (privClassDBMappingManager == null) {
                 privClassDBMappingManager = ClassDBMappingManager()
                 privClassDBMappingManager!!.owner = this
 
-                visitorManager.registerVisitor(CuStandardTask_ReadPK, VisAutoCollectionPKRead )
+                visitorManager.registerVisitor(CuStandardTask_ReadPK, VisAutoCollectionPKRead::class )
             }
 
             return privClassDBMappingManager!!

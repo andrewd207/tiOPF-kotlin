@@ -46,6 +46,9 @@ open class ObjectList<T: BaseObject>: Object(), MutableList<T> {
         newList.items = subList as List<T>
         return newList
     }
+    override fun indexOf(element: T): Int{
+        return items.indexOf(element)
+    }
 
     private var items = List<T>()
     var autosetItemOwner: Boolean = true
@@ -89,9 +92,7 @@ open class ObjectList<T: BaseObject>: Object(), MutableList<T> {
             endUpdate()
         }
     }
-    fun indexOf(element: T): Int{
-        return items.indexOf(element)
-    }
+
 
     fun last(): T? {
         if (count() > 0 )

@@ -1,25 +1,18 @@
 package tiOPF
 
-interface IVisitorClass{
-    fun createInstance(): Visitor
-    fun visitorControllerClass(): IVisitorControllerClass
-    val name: String
-}
+import kotlin.reflect.KClass
+import kotlin.reflect.full.companionObjectInstance
+import kotlin.reflect.full.superclasses
 
-open class Visitor: BaseObject() {
-    companion object : IVisitorClass{
-
-        override fun createInstance(): Visitor {
-            return Visitor()
-        }
-
-        override fun visitorControllerClass(): IVisitorControllerClass {
-            return VisitorController
-        }
-
-        override val name: String
-            get() = "Visitor"
+interface IVisitor{
+    fun visitorControllerClass(): KClass<VisitorController> {
+        return VisitorController::class
     }
+
+}
+open class Visitor: BaseObject() {
+    companion object: IVisitor
+
     enum class IterationStyle {isTopDownRecurse, isTopDownSinglePass, isBottomUpSinglePass}
     protected open var privVisited: Visited? = null
     open val visited: Visited?
@@ -65,9 +58,18 @@ open class Visitor: BaseObject() {
         return visitBranch(derivedParent, visited)
     }
 
-    open fun execute(visited: Visited){
+    open fun execute(visited: Visited?){
         privVisited = visited
     }
 
 
+}
+
+
+fun getControllerClass(kClass: KClass<Visitor>): KClass<VisitorController>{
+    if (kClass.companionObjectInstance != null && kClass.companionObjectInstance is IVisitor)
+        return (kClass.companionObjectInstance as IVisitor).visitorControllerClass()
+
+    // at least return something
+    return VisitorController::class
 }

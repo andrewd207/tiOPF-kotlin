@@ -1,5 +1,5 @@
 package tiOPF
-
+// complete
 import kotlin.reflect.KClass
 
 abstract class VisAutoAbs: ObjectVisitor() {
@@ -353,7 +353,7 @@ open class VisAutoCollectionRead: VisAutoAbs() {
         //do nothing
     }
 }
-class VisAutoCollectioPKRead: VisAutoCollectionRead(){
+class VisAutoCollectionPKRead: VisAutoCollectionRead(){
     override fun getAttrColMaps() {
         super.getAttrColMaps()
         val list = List<AttrColMap>()
