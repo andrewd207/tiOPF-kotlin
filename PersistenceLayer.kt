@@ -9,6 +9,10 @@ interface IPersistenceLayerClass{
 
 abstract class PersistenceLayer: Object(){
     companion object : IPersistenceLayerClass
+
+    public override var persistenceLayerName: String
+        get() = super.persistenceLayerName
+        set(value) { super.persistenceLayerName = value}
     private  var privdbConnectionPools: DBConnectionPools? = null
     val dbConnectionPools: DBConnectionPools
       get() { // all this is so we don't leak "this" in constructor

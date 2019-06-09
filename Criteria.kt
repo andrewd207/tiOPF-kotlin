@@ -42,10 +42,12 @@ open class Criteria(name: String = ""): Object() {
         privIsEmbraced = source.isEmbraced
         privName = source.name
     }
-    fun mapFieldNames(kClass: KClass<Object>){
+    fun mapFieldNames(kClass: KClass<*>){
         val maps = criteriaAttrColMaps
         GTIOPFManager().classDBMappingManager.attrColMaps.findAllMappingsByMapToClass(kClass, maps)
         val visProAttributeToFieldName = VisProAttributeToFieldName(maps, kClass)
+        iterate(visProAttributeToFieldName)
+
         orderByList.forEach {
             val map = maps.findByClassAttrMap(kClass, it.name)
             if (map != null)
@@ -133,6 +135,7 @@ open class Criteria(name: String = ""): Object() {
 
         val list: MutableList<Any> = mutableListOf()
 
+        @Suppress("UNCHECKED_CAST")
         (objectList as ObjectList<Object>).forEach {
             if (it.objectState != PerObjectState.Delete){
                 list.add(it.getPropValue<Any>(fieldName)!!)

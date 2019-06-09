@@ -12,7 +12,7 @@ class ClassDBMappingManager: Object() {
         val dbTableMap = dbMap.findCreate(tableName)
         val dbColMap = dbTableMap.addColMap(colName, pkInfo)
 
-        val classMap = classMaps.findCreate(kClass as KClass<Object>)
+        val classMap = classMaps.findCreate(kClass)
         val attrMap = classMap.addAttrMap(attrName)
         attrMap.objectState = PerObjectState.Clean
         attrColMaps.addMapping(attrMap, dbColMap)

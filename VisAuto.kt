@@ -2,6 +2,7 @@ package tiOPF
 // complete
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.isSubclassOf
 
 abstract class VisAutoAbs: ObjectVisitor() {
     protected val whereAttrColMaps = AttrColMaps()
@@ -9,7 +10,7 @@ abstract class VisAutoAbs: ObjectVisitor() {
     protected val attrColMaps = AttrColMaps()
     protected val params = QueryParams()
 
-    protected var visitedClassType: KClass<Object>? = null
+    protected var visitedClassType: KClass<*>? = null
     override fun execute(visited: Visited?) {
         super.execute(visited)
         visitedClassType = visited!!::class as KClass<Object>
@@ -194,7 +195,7 @@ open class VisAutoReadThis: VisAutoAbs(){
 }
 open class VisAutoCollectionRead: VisAutoAbs() {
     private var hasParent = false
-    private var classToCreate: KClass<Object>? = null
+    private var classToCreate: KClass<*>? = null
     private var classDBCollection: ClassDBCollection? = null
     private var criteria: Criteria? = null
     private val classesWithParent = List<Any>()
@@ -328,16 +329,18 @@ open class VisAutoCollectionRead: VisAutoAbs() {
             return
         val list = visited as ObjectList<Object>
         var dataNew: Object
+        if (!classToCreate!!.isSubclassOf(Object::class))
+            throw Exception("attempt to createInstance of unsupported type ")
         if (checkForDuplicates && duplicateObject(/*assigns index*/)){
             val dataOld = list[index]
-            dataNew = classToCreate!!.createInstance()
+            dataNew = classToCreate!!.createInstance() as Object
             dataNew.assign(dataOld)
             index = list.indexOf(dataOld)
             list.add(index, dataNew)
             list.remove(dataOld)
         }
         else {
-            dataNew = classToCreate!!.createInstance()
+            dataNew = classToCreate!!.createInstance() as Object
             list.add(dataNew)
         }
 

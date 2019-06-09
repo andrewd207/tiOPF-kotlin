@@ -14,7 +14,7 @@ class ClassMap: ObjectList<AttrMap>() {
     val ownerAsClassDBMappingManager: ClassDBMappingManager get() = owner as ClassDBMappingManager
     override val caption: String get() { return perObjAbsClass!!.qualifiedName!! }
 
-    var perObjAbsClass: KClass<Object>? = null
+    var perObjAbsClass: KClass<*>? = null
     var parentClassMap: ClassMap? = null
 
     fun addAttrMap(attrName: String): AttrMap{
@@ -38,10 +38,10 @@ class ClassMap: ObjectList<AttrMap>() {
 
 class ClassMaps: ObjectList<ClassMap>(){
     val ownerAsClassDBMappingManager: ClassDBMappingManager get() = owner as ClassDBMappingManager
-    protected fun findByPerObjAbsClass(kClass: KClass<Object>): ClassMap?{
+    protected fun findByPerObjAbsClass(kClass: KClass<*>): ClassMap?{
         return find { it. perObjAbsClass == kClass }
     }
-    fun addClassMap(kClass: KClass<Object>): ClassMap{
+    fun addClassMap(kClass: KClass<*>): ClassMap{
         var result = find { it.perObjAbsClass == kClass }
         if (result != null)
             throw Exception("Attempt to register duplicate TtiClassMap\n" +
@@ -53,18 +53,18 @@ class ClassMaps: ObjectList<ClassMap>(){
         add(result)
         return result
     }
-    fun findCreate(kClass: KClass<Object>): ClassMap{
+    fun findCreate(kClass: KClass<*>): ClassMap{
         var result = find { it.perObjAbsClass == kClass }
         if (result == null)
             result = addClassMap(kClass)
         return result
     }
-    fun findParent(kClass: KClass<Object>): ClassMap?{
+    fun findParent(kClass: KClass<*>): ClassMap?{
         val classMap = findByPerObjAbsClass(kClass)
         assert(classMap != null, {"Attempt to find parent on unregistered class <${kClass.qualifiedName}>"})
         return classMap
     }
-    fun findAllParents(kClass: KClass<Object>, list: ClassMaps){
+    fun findAllParents(kClass: KClass<*>, list: ClassMaps){
         assert(!list.ownsObjects, {"list.ownsObjects is true and it should be false"});
         list.clear()
         var classMap: ClassMap? = findByPerObjAbsClass(kClass)
@@ -75,11 +75,11 @@ class ClassMaps: ObjectList<ClassMap>(){
             list.add(0, classMap!!)
         }
     }
-    fun hasParent(kClass: KClass<Object>): Boolean{
+    fun hasParent(kClass: KClass<*>): Boolean{
         return findParent(kClass) != null
     }
 
-    fun isClassRegistered(kClass: KClass<Object>): Boolean{
+    fun isClassRegistered(kClass: KClass<*>): Boolean{
         return find { it.perObjAbsClass == kClass } != null
     }
 

@@ -19,7 +19,7 @@ const val CErrorSettingPropValue     = "Error setting property value for <%s> on
 fun getPropertyNames(instance: BaseObject, list: List<String>, propFilter: Set<TypeKind>){
     instance::class.memberProperties.forEach {
         val kClass = it.returnType.classifier as KClass<*>
-        if (classToTypeKind(kClass) in propFilter)
+        if (classToTypeKind(kClass) in propFilter && it.visibility == KVisibility.PUBLIC)
             list.add(it.name)
     }
 }

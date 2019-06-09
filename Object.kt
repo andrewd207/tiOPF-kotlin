@@ -54,7 +54,10 @@ open class Object(): Visited(), IObject<Object> {
     open var owner: Object? = null
     var objectState = PerObjectState.Empty
     protected open var databaseName =""
-    open var persistenceLayerName =""
+    internal fun getPersistenceLayerName(): String{
+        return persistenceLayerName
+    }
+    protected open var persistenceLayerName =""
     val updateTopicList = mutableListOf<String>()
     var observerList: MutableList<Object>? = mutableListOf() // TODO different type?
     open var deleted: Boolean

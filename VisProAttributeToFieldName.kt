@@ -2,7 +2,7 @@ package tiOPF
 // complete
 import kotlin.reflect.KClass
 
-class VisProAttributeToFieldName(private val attrColMaps: AttrColMaps, private val classType: KClass<Object>): Visitor() {
+class VisProAttributeToFieldName(private val attrColMaps: AttrColMaps, private val classType: KClass<*>): Visitor() {
     override fun acceptVisitor(): Boolean {
         return visited is SelectionCriteriaAbs
     }

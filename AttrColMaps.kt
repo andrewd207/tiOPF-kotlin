@@ -9,21 +9,21 @@ class AttrColMaps: ObjectList<AttrColMap>() {
         map.objectState = PerObjectState.Clean
         add(map)
     }
-    fun findAllMappingsByMapToClass(klass: KClass<Object>, list: AttrColMaps){
+    fun findAllMappingsByMapToClass(klass: KClass<*>, list: AttrColMaps){
         list.clear()
         forEach{
             if (it.attrMap.ownerAsClassMap.perObjAbsClass == klass)
                 list.add(it)
         }
     }
-    fun findAllPKMappingsByMapToClass(klass: KClass<Object>, list: AttrColMaps){
+    fun findAllPKMappingsByMapToClass(klass: KClass<*>, list: AttrColMaps){
         list.clear()
         forEach {
             if (it.attrMap.ownerAsClassMap.perObjAbsClass == klass && it.dbColMap.pkInfo.contains(ClassDBMapRelationshipType.Primary))
                 list.add(it)
         }
     }
-    fun findByClassAttrMap(klass: KClass<Object>, attrName: String): AttrColMap?{
+    fun findByClassAttrMap(klass: KClass<*>, attrName: String): AttrColMap?{
         forEach {
             if (it.attrMap.ownerAsClassMap.perObjAbsClass == klass && it.attrMap.attrName.equals(attrName, true))
                 return it
