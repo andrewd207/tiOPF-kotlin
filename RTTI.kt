@@ -16,7 +16,7 @@ const val CErrorIsNumericProp        = "Error in tiIsNumericProp. Message: %s"
 const val CErrorSimpleTypeKind       = "Error in tiGetSimpleTypeKind. Property name: %s  Message: %s"
 const val CErrorSettingPropValue     = "Error setting property value for <%s> on <%s> Message <%s>"
 
-fun getPropertyNames(instance: Object, list: List<String>, propFilter: Array<TypeKind>){
+fun getPropertyNames(instance: BaseObject, list: List<String>, propFilter: Set<TypeKind>){
     instance::class.memberProperties.forEach {
         val kClass = it.returnType.classifier as KClass<*>
         if (classToTypeKind(kClass) in propFilter)

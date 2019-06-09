@@ -26,4 +26,8 @@ class TouchedByVisitorList: BaseObject() {
     fun items(index: Int): List<TouchedByVisitor>{
         return list
     }
+
+    init {
+
+    }
 }

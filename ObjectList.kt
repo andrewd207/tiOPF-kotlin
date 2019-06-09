@@ -34,7 +34,7 @@ open class ObjectList<T: Object>: Object(), MutableCollection<T> {
                 o.owner = value
             }
         }
-
+    var ownsObjects: Boolean = true
 
 
     override fun assign(source: Object){
