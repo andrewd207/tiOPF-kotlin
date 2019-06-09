@@ -39,7 +39,7 @@ fun getPropertyType(instance: Any, propName: String): TypeKind{
 }
 
 fun isReadWriteProp(instance: Any, propName: String): Boolean{
-    val prop = instance::class.declaredMemberProperties.find { it.name == propName } ?: return false
+    val prop = instance::class.memberProperties.find { it.name == propName } ?: return false
     return prop is KMutableProperty<*>
 }
 
@@ -55,20 +55,20 @@ fun getPropertyInheritsFrom(typeClass: KClass<*>, propName: String, propKlass: K
 }
 
 fun <T: Any>getObjectProperty(instance: Any, propName: String): T?{
-    val property = instance::class.declaredMemberProperties.find{it.name === propName}
-    if (property != null && property.isAccessible && property.visibility == KVisibility.PUBLIC)
-        return property.getter.call() as T
+    val property = instance::class.memberProperties.find{it.name == propName}
+    if (property != null && /*property.isAccessible &&*/ property.visibility == KVisibility.PUBLIC)
+        return property.call(instance) as T
 
     return null
 }
 
 fun <T>setObjectProperty(instance: Any, propName: String, value: T){
-    val property = instance::class.declaredMemberProperties.find { it.name === propName }
-    if (property is KMutableProperty<*>)
-        property.setter.call(value)
+    val property = instance::class.memberProperties.find{ it.name == propName }
+    if (property != null && /*property.isAccessible &&*/ property.visibility == KVisibility.PUBLIC && property is KMutableProperty<*>)
+        property.setter.call(instance, value)
 }
 fun isPublishedProp(kClass: KClass<*>, propName: String): Boolean{
-    val property = kClass.declaredMemberProperties.find { it.name === propName }
+    val property = kClass.memberProperties.find { it.name === propName }
     property?: return false
 
     return property.findAnnotation<Published>() != null
@@ -76,7 +76,7 @@ fun isPublishedProp(kClass: KClass<*>, propName: String): Boolean{
 }
 
 fun isPublicProp(instance: Any, propName: String): Boolean{
-    val property = instance::class.declaredMemberProperties.find { it.name === propName }
+    val property = instance::class.memberProperties.find { it.name === propName }
     if (property != null)
         return property.visibility == KVisibility.PUBLIC
     return false
