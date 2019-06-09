@@ -4,7 +4,10 @@ import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.superclasses
 
+val CTypeKindSimple = setOf(TypeKind.STRING, TypeKind.INT, TypeKind.FLOAT)
+
 enum class TypeKind {
+
     STRING,
     CHAR,
     INT,

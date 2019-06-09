@@ -3,7 +3,7 @@ package tiOPF
 typealias PerObjectList = ObjectList<*>
 //typealias PerObjList = ObjectList<Object>
 
-open class ObjectList<T: Object>: Object(), MutableCollection<T> {
+open class ObjectList<T: BaseObject>: Object(), MutableList<T> {
     override val size: Int
         get() {return count()}
 
@@ -23,8 +23,31 @@ open class ObjectList<T: Object>: Object(), MutableCollection<T> {
         notifyObservers(this, NotifyOperation.noAddItem, item, "")
         return result
     }
+    override fun add(index: Int, element: T) {
+        items.add(index, element)
+    }
+    override fun addAll(index: Int, elements: Collection<T>): Boolean {
+        return items.addAll(index, elements)
+    }
+    override fun lastIndexOf(element: T): Int {
+        return items.lastIndexOf(element)
+    }
+    override fun listIterator(): MutableListIterator<T> {
+        return items.listIterator()
+    }
+    override fun listIterator(index: Int): MutableListIterator<T> {
+        return items.listIterator(index)    }
+    override fun removeAt(index: Int): T {
+        return items.removeAt(index)
+    }
+    override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
+        val subList = items.subList(fromIndex, toIndex)
+        val newList = ObjectList<T>()
+        newList.items = subList as List<T>
+        return newList
+    }
 
-    val items = List<T>()
+    private var items = List<T>()
     var autosetItemOwner: Boolean = true
     var itemOwner: Object? = null
         set(value) {
@@ -40,11 +63,12 @@ open class ObjectList<T: Object>: Object(), MutableCollection<T> {
     override fun assign(source: Object){
     }
 
-    fun get(index: Int): T{
+    override fun get(index: Int): T{
         return items[index]
     }
-    fun set(index: Int, value: T){
+    override fun set(index: Int, value: T): T{
         items[index] = value
+        return value
     }
 
     override fun clear(){
@@ -74,5 +98,15 @@ open class ObjectList<T: Object>: Object(), MutableCollection<T> {
             return items.last()
 
         return null
+    }
+
+    fun find(oidToFind: OID): T?{
+        return find { (it as Object).oid.equals(oidToFind) }
+
+    }
+    fun find(oidToFindAsString: String): T?{
+        val tmpOID = oidGenerator().createOIDInstance()
+        tmpOID.asString = oidToFindAsString
+        return  find { (it as Object).oid.equals(tmpOID)}
     }
 }

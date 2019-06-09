@@ -4,8 +4,7 @@ import kotlin.reflect.KClass
 
 typealias VisitedTouchMethod = (candidates: Visited, visitor: Visitor, list: TouchedByVisitorList, iterationDepth: Int) -> Unit
 
-open class Visited: BaseObject{
-    constructor() :super()
+open class Visited: BaseObject(){
     @Published open val caption: String = this::class.toString()
     fun iterate(visitor: Visitor){
         val touchedByVisitorList = TouchedByVisitorList()

@@ -89,3 +89,7 @@ fun <T>Object.newInstance(vararg args: Any?): T{
 fun BaseObject.className(): String{
     return this::class.qualifiedName!!
 }
+
+fun KClass<Object>.createInstance(): Object{
+    return this.primaryConstructor!!.call()
+}

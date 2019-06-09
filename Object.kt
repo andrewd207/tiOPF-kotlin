@@ -178,4 +178,10 @@ open class Object(): Visited(), IObject<Object> {
 
     }
 
+    fun getPropCount(propFilter: Set<TypeKind> = CTypeKindSimple): Int{
+        val list = List<String>()
+        getPropertyNames(this, list, propFilter)
+        return list.size
+    }
+
 }

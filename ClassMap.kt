@@ -38,6 +38,9 @@ class ClassMap: ObjectList<AttrMap>() {
 
 class ClassMaps: ObjectList<ClassMap>(){
     val ownerAsClassDBMappingManager: ClassDBMappingManager get() = owner as ClassDBMappingManager
+    protected fun findByPerObjAbsClass(kClass: KClass<Object>): ClassMap?{
+        return find { it. perObjAbsClass == kClass }
+    }
     fun addClassMap(kClass: KClass<Object>): ClassMap{
         var result = find { it.perObjAbsClass == kClass }
         if (result != null)
@@ -55,6 +58,14 @@ class ClassMaps: ObjectList<ClassMap>(){
         if (result == null)
             result = addClassMap(kClass)
         return result
+    }
+    fun findParent(kClass: KClass<Object>): ClassMap?{
+        val classMap = findByPerObjAbsClass(kClass)
+        assert(classMap != null, {"Attempt to find parent on unregistered class <${kClass.qualifiedName}>"})
+        return classMap
+    }
+    fun hasParent(kClass: KClass<Object>): Boolean{
+        return findParent(kClass) != null
     }
 
     fun isClassRegistered(kClass: KClass<Object>): Boolean{
