@@ -146,10 +146,40 @@ open class Object(): Visited(), IObject<Object> {
 
     }
     protected open fun assignPublicProps(source: Object){
-        // TODO
+        oid.assign(source.oid)
+        objectState = source.objectState
+        if (source.owner is ObjectList<*>)
+            owner = source.owner
     }
-    protected open fun assignPublishedProps(source: Object){
-        // TODO
+    protected fun assignPublishedProp(source: Object, propName: String){
+        setPropValue<Any>(propName, source.getPropValue(propName)!!)
+    }
+
+    protected open fun assignPublishedProps(source: Object, propFilter: TypeKinds = setOf()){
+        val localFilter: TypeKinds
+        if (propFilter.isEmpty())
+            localFilter = CTypeKindSimple.plus(TypeKind.ENUM)
+        else
+            localFilter = propFilter
+
+        val list = List<String>()
+        getPropertyNames(this, list, localFilter)
+        list.forEach {
+            println("assigning $it")
+            if (isReadWriteProp(it) && isPublishedProp(this::class, it)){
+                try {
+
+                    assignPublishedProp(source, it)
+
+                }
+                catch (e: Exception){
+                    throw Exception(CErrorSettingProperty.format(className(), it, e.message))
+                }
+
+
+            }
+        }
+
     }
 
     open fun isReadWriteProp(propName: String): Boolean{

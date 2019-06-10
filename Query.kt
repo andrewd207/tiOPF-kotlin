@@ -49,7 +49,7 @@ abstract class Query: BaseObject() {
             return field
         }
 
-    open fun assignParams(params: QueryParams, where: QueryParams? = null){
+    open fun assignParams(params: QueryParams?, where: QueryParams? = null){
         if (params != null)
             for (i in 0..params.count()-1)
                 params[i].assignToTIQuery(this)
@@ -107,7 +107,7 @@ abstract class Query: BaseObject() {
 
     abstract fun selectRow(tableName: String, where: QueryParams, criteria: Criteria? = null)
     abstract fun insertRow(tableName: String, params: QueryParams)
-    abstract fun deleteRow(tableName: String, params: QueryParams)
+    abstract fun deleteRow(tableName: String, where: QueryParams)
     abstract fun updateRow(tableName: String, params: QueryParams, where: QueryParams)
 
     abstract fun next()

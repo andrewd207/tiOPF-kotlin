@@ -35,7 +35,22 @@ fun tiAddEllipsis(string: String, width: Int = 20): String{
     when {
         len < width -> return string
         len > width -> return string.substring(0, width-4) + "..."
-        else -> return string.substring(0, len-4) + "..."
     }
+    return string.substring(0, len-4) + "..."
+}
+
+fun getParamName(paramNo: Int, addColon: Boolean): String{
+    var result = "Criteria_$paramNo"
+    if (addColon)
+        result = ":$result"
+    return result
+}
+
+fun getSQLValue(value: Any): String{
+    if (value is String)
+        return "'"+value.replace("'", "\'")+"'"
+
+    return value.toString()
+
 }
 

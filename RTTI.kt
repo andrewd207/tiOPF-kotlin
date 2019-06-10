@@ -71,7 +71,8 @@ fun isPublishedProp(kClass: KClass<*>, propName: String): Boolean{
     val property = kClass.memberProperties.find { it.name === propName }
     property?: return false
 
-    return property.findAnnotation<Published>() != null
+    //return property.findAnnotation<Published>() != null
+    return property.visibility == KVisibility.PUBLIC
 
 }
 

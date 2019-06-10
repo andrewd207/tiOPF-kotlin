@@ -24,6 +24,8 @@ open class Criteria(name: String = ""): Object() {
     private var privIsEmbraced = false
     val isEmbraced: Boolean
         get() = privIsEmbraced
+    val hasCriteria: Boolean get () { return criteriaList.size > 0 || selectionCriteriaList.size > 0}
+    val hasOrderBy: Boolean get () { return orderByList.isNotEmpty()}
 
     override fun assignClassProps(source: Object) {
         assert(source is Criteria, { CTIErrorInvalidObject })
@@ -200,6 +202,37 @@ open class Criteria(name: String = ""): Object() {
         groupByList.clear()
     }
 
+    internal fun asSql(params: QueryParams, withComments: Boolean = false): String{
+        var result = ""
+        if (!hasCriteria)
+            return ""
+        val visitor = VisObjectToSQL(withComments)
+        visitor.params = params
+        iterate(visitor)
+        result = visitor.text
+        if (isEmbraced && result.isNotEmpty())
+            result = "($result)"
+        else
+            result += "\n"
+        return  result
+    }
+    internal fun orderByAsSQL(): String{
+        fun orderText(columnId: Int): String{
+            if (orderByList[columnId].ascending)
+                return orderByList[columnId].fieldName
+            return orderByList[columnId].fieldName+ " DESC"
+
+        }
+        var result = ""
+        if (!hasOrderBy)
+            return result
+        result = " ORDER BY "+ orderText(0)
+        for (i in 1 until orderByList.size)
+            result += ", "+ orderText(i)
+        result+= "\n"
+        return result
+    }
+
     init {
         criteriaList.owner = this
         criteriaList.itemOwner = this
@@ -242,6 +275,22 @@ abstract class SelectionCriteriaAbs(@Published var attribute: String, @Published
         isNegative = source.isNegative
         value = source.value
     }
+
+    protected open fun toSelectClause(params: QueryParams? = null, paramNo: ValueReference<Int>? = null): String{
+        // do nothing. not all classes will implement this
+        var result = ""
+        if (params != null && paramNo != null){
+            result = fieldName + getClause() + getParamName(paramNo.value, true)
+            params.setParamAsString(getParamName(paramNo.value, false), value.toString())
+            paramNo.value++
+        }
+        else
+            result = fieldName+getClause()+ getSQLValue(value)
+        return result
+    }
+    internal fun intToSelectClause(params: QueryParams? = null, paramNo: ValueReference<Int>? = null): String{
+        return toSelectClause(params, paramNo)
+    }
 }
 
 class Column: Object(){
@@ -263,7 +312,11 @@ class Columns: ObjectList<Column>(){
 }
 
 abstract class ValueCriteriaAbs(attribute: String, value: Any, isNegative: Boolean = false, fieldName: String = ""): SelectionCriteriaAbs(attribute, value, isNegative, fieldName)
-abstract class FieldCriteriaAbs(attribute: String, value: Any, isNegative: Boolean = false, fieldName: String = ""): SelectionCriteriaAbs(attribute, value, isNegative, fieldName)
+abstract class FieldCriteriaAbs(attribute: String, value: Any, isNegative: Boolean = false, fieldName: String = ""): SelectionCriteriaAbs(attribute, value, isNegative, fieldName){
+    override fun toSelectClause(params: QueryParams?, paramNo: ValueReference<Int>?): String {
+        return fieldName + getClause() + getSQLValue(value)
+    }
+}
 
 class EqualToCriteria(attribute: String, value: Any, isNegative: Boolean = false, fieldName: String = ""): ValueCriteriaAbs(attribute, value, isNegative, fieldName){
     override fun getClause(): String {
@@ -285,6 +338,10 @@ class ExistsCriteria(subQuery: String, isNegative: Boolean = false, fieldName: S
             return " NOT EXISTS "
         return " EXISTS "
 
+    }
+
+    override fun toSelectClause(params: QueryParams?, paramNo: ValueReference<Int>?): String {
+        return getClause() + "("+value+")"
     }
 }
 class GreaterThanCriteria(attribute: String, value: Any, isNegative: Boolean = false, fieldName: String = ""): ValueCriteriaAbs(attribute, value, isNegative, fieldName){
@@ -308,6 +365,29 @@ class InCriteria(attribute: String, value: Any, isNegative: Boolean = false, fie
         return " IN "
     }
     var valueArray: Array<Any> = arrayOf()
+    override fun toSelectClause(params: QueryParams?, paramNo: ValueReference<Int>?): String {
+        var result = ""
+        var sep = ""
+        if (valueArray.isNotEmpty() ){
+            result = fieldName + getClause() + "("
+            valueArray.forEach {
+                if (params != null){
+                    result += sep + getParamName(paramNo!!.value, true)
+                    params.setParamAsString(getParamName(paramNo.value, false), it.toString())
+                    paramNo.value++
+                }
+                else {
+                    result += sep + getSQLValue(it)
+                }
+                sep = ", "
+            }
+            result += ")"
+        }
+        else {
+            result = fieldName + getClause() + "(" + value + ")"
+        }
+        return result
+    }
 
 }
 class LessThanCriteria(attribute: String, value: Any, isNegative: Boolean = false, fieldName: String = ""): ValueCriteriaAbs(attribute, value, isNegative, fieldName){
@@ -337,6 +417,10 @@ class NullCriteria(attribute: String, isNegative: Boolean = false, fieldName: St
             return " IS NOT NULL "
         return " IS NULL "
     }
+
+    override fun toSelectClause(params: QueryParams?, paramNo: ValueReference<Int>?): String {
+        return fieldName + getClause()
+    }
 }
 class BetweenCriteria(attribute: String, value1: Any, val value2: Any, isNegative: Boolean = false, fieldName: String = ""):
     ValueCriteriaAbs(attribute, value1, isNegative, fieldName){
@@ -346,9 +430,28 @@ class BetweenCriteria(attribute: String, value1: Any, val value2: Any, isNegativ
         return " BETWEEN "
     }
 
+    override fun toSelectClause(params: QueryParams?, paramNo: ValueReference<Int>?): String {
+        var result = ""
+        if (params != null){
+            var result = fieldName+getClause()+ getParamName(paramNo!!.value, true)
+                    " AND " + getParamName(paramNo!!.value+1, true )
+            params.setValueAsString(getParamName(paramNo.value, false), value.toString())
+            params.setValueAsString(getParamName(paramNo.value+1, false), value2.toString())
+            paramNo.value+=2
+        }
+        else {
+            result = fieldName + getClause() + getSQLValue(value) + " AND " + getSQLValue(value2)
+        }
+        return result
+    }
+
 }
 class SQLCriteria(sqlStatement: String): SelectionCriteriaAbs(sqlStatement, "", false, ""){
     override fun getClause(): String {
         return attribute
+    }
+
+    override fun toSelectClause(params: QueryParams?, paramNo: ValueReference<Int>?): String {
+        return getClause()
     }
 }

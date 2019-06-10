@@ -45,7 +45,7 @@ abstract class Database: BaseObject() {
 
     abstract fun readMetadataTables(data: DBMetadata)
     abstract fun readMetadataFields(data: DBMetadataTable)
-    open fun execSQL(sql: String, params: QueryParams){
+    open fun execSQL(sql: String, params: QueryParams? = null){
         val query = createAndAttachQuery()
         val hadToStartTransaction = !inTransaction()
         if (hadToStartTransaction)
