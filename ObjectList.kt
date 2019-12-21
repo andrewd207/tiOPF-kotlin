@@ -5,7 +5,7 @@ typealias PerObjectList = ObjectList<*>
 
 open class ObjectList<T: BaseObject>: Object(), MutableList<T> {
     override val size: Int
-        get() {return count()}
+        get() {return items.count()}
 
     override fun contains(element: T): Boolean { return items.contains(element)  }
     override fun containsAll(elements: Collection<T>): Boolean { return items.containsAll(elements) }
@@ -16,11 +16,13 @@ open class ObjectList<T: BaseObject>: Object(), MutableList<T> {
     override fun removeAll(elements: Collection<T>): Boolean { return items.removeAll(elements) }
     override fun retainAll(elements: Collection<T>): Boolean { return items.retainAll(elements) }
     override fun add(element: T): Boolean{
-        val item = element as Object
-        if (autosetItemOwner)
-            item.owner = this
+        val item = element as BaseObject
+        if (autosetItemOwner && element is Object)
+            (item as Object).owner = this
         val result = items.add(element)
-        notifyObservers(this, NotifyOperation.noAddItem, item, "")
+        if (element is Object)
+            notifyObservers(this, NotifyOperation.noAddItem, item as Object, "")
+
         return result
     }
     override fun add(index: Int, element: T) {
@@ -56,8 +58,10 @@ open class ObjectList<T: BaseObject>: Object(), MutableList<T> {
         set(value) {
             field = value
             items.forEach{
-                val o = it as Object
-                o.owner = value
+                if (it is Object) {
+                    val o = it as Object
+                    o.owner = value
+                }
             }
         }
     var ownsObjects: Boolean = true

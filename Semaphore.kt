@@ -9,6 +9,10 @@ class Semaphore(val maximumCount: Int) {
     private var privCount = 0
     val count: Int get() = privCount
     var timeout: Long = 0
+    init{
+        privCount = maximumCount
+    }
+
     fun acquire():Boolean{
         var result = false
         if (privCount > 0) {

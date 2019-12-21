@@ -19,8 +19,6 @@ class ClassDBMappingManager: Object() {
     }
     fun registerMapping(kClass: KClass<*>, tableName: String, attrName: String, colName: String, pkInfo: PKInfo = setOf()){
         registerMapping("", kClass, tableName, attrName, colName, pkInfo)
-
-
     }
     fun registerCollection(collectionClass: KClass<PerObjectList>, collectionOfClass: KClass<*>){
         collections.addClassCollectionMapping(collectionClass, collectionOfClass)

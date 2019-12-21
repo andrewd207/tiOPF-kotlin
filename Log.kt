@@ -15,6 +15,12 @@ fun LOG(message: String, severity: LogSeverity = LogSeverity.lsNormal) {
     GLog()?.log(message, severity)
 }
 
+fun LOGERROR(exception: Exception, throwException: Boolean = true) {
+    GLog()?.log(exception.message!!, LogSeverity.lsError)
+    if (throwException)
+        throw exception
+}
+
 fun LOG(array: Any, severity: LogSeverity = LogSeverity.lsNormal) {
     //GLog().log(message, severity)
 }

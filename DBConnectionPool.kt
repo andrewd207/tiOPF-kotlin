@@ -4,13 +4,14 @@ package tiOPF
 import kotlin.reflect.KClass
 
 open class DBConnectionPool(protected val dbConnectionPools: DBConnectionPools, val databaseAlias: String,val dbConnectionParams: DBConnectionParams): Pool(dbConnectionPools.minPoolSize, dbConnectionPools.maxPoolSize) {
-    override fun pooledItemClass(): KClass<*> {
-        return PooledDatabase::class
+    override fun pooledItemInterface(): IPooledItemClass {
+        return PooledDatabase.Companion
     }
 
     override fun afterAddPooledItem(item: PooledItem) {
         val layer = dbConnectionPools.persistenceLayer
-        val database = layer.databaseClass.createInstance()
+        val database = layer.databaseCompanion.createInstance()
+        item.data = database
         database.connect(   dbConnectionParams.databaseName,
                             dbConnectionParams.userName,
                             dbConnectionParams.password,

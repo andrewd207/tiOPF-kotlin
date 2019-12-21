@@ -39,6 +39,40 @@ fun tiAddEllipsis(string: String, width: Int = 20): String{
     return string.substring(0, len-4) + "..."
 }
 
+fun tiNumToken(value: String, token: Char):Int{
+    val foundChars = value.filter { it == token }
+    return foundChars.length
+
+}
+
+fun tiGetTickCount(): ULong {
+    return (now() * 24 * 60 * 60 * 1000).toULong()
+}
+
+fun tiToken(value: String, token: Char, pos: Int = 0, tokenCount: Int = 1): String{
+    var i: Int = 0
+    var found: Int = -1
+    var foundCount = 0;
+    value.forEach{
+        if (i >= pos && it == token){
+            foundCount++
+            found = i-1
+            if (foundCount == tokenCount)
+                return value.substring(pos, i)
+
+        }
+        i++
+    }
+    if (found > -1)
+        return value.substring(pos, found)
+
+    if (pos == 0)
+        return value
+
+    return value.substring(pos, value.lastIndex)
+
+}
+
 fun getParamName(paramNo: Int, addColon: Boolean): String{
     var result = "Criteria_$paramNo"
     if (addColon)

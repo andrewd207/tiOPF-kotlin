@@ -30,6 +30,33 @@ abstract class QuerySQL: Query() {
             result += "\n\nParams:$params"
         return result
     }
+
+    fun paramsAsStringList(): List<String>{
+        val result = List<String>()
+        try {
+            for (i in 0 until paramCount()) {
+                val s = if (getParamIsNull(paramName(i)))
+                    "null"
+                else
+                    getParamAsString(paramName(i))
+
+                result.add(paramName(i) + '=' + s)
+            }
+        }
+        catch (e: Exception){
+            LOGERROR(e, true)
+        }
+        return result
+    }
+
+    internal fun logParams(){
+        val line = "%s: [Param %d] %s"
+        val list: List<String> = paramsAsStringList()
+        list.forEachIndexed{index, it ->
+                LOG(line.format(className(), index+1, it, LogSeverity.lsSQL))
+        }
+    }
+
     override fun selectRow(tableName: String, where: QueryParams, criteria: Criteria?) {
         var criteriaWhere = ""
         var lWhere = ""

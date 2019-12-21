@@ -68,7 +68,8 @@ fun <T>setObjectProperty(instance: Any, propName: String, value: T){
         property.setter.call(instance, value)
 }
 fun isPublishedProp(kClass: KClass<*>, propName: String): Boolean{
-    val property = kClass.memberProperties.find { it.name === propName }
+    //kClass.memberProperties.forEach { println("popr: ${it.name}") }
+    val property = kClass.memberProperties.find { it.name.equals(propName) }
     property?: return false
 
     //return property.findAnnotation<Published>() != null

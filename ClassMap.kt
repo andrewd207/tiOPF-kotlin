@@ -8,10 +8,10 @@ class ClassMap: ObjectList<AttrMap>() {
         return propName.toLowerCase() in arrayOf("oid", "owner.oid")
 
     }
-    private fun isPublishedProp(propName: String): Boolean{
-        return isPublicProp(propName) || isPublishedProp(perObjAbsClass!!::class, propName)
-    }
     val ownerAsClassDBMappingManager: ClassDBMappingManager get() = owner as ClassDBMappingManager
+    private fun isPublishedProp(propName: String): Boolean{
+        return isPublicProp(propName) || isPublishedProp(perObjAbsClass!!, propName)
+    }
     override val caption: String get() { return perObjAbsClass!!.qualifiedName!! }
 
     var perObjAbsClass: KClass<*>? = null

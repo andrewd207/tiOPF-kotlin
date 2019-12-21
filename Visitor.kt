@@ -2,6 +2,7 @@ package tiOPF
 
 import kotlin.reflect.KClass
 import kotlin.reflect.full.companionObjectInstance
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.superclasses
 
 interface IVisitor{
@@ -19,7 +20,7 @@ open class Visitor: BaseObject() {
         get() = privVisited
 
 
-    var continueVisiting: Boolean = false
+    var continueVisiting: Boolean = true
     private var privDepth = 0
     val depth: Int
         get() = privDepth
@@ -67,8 +68,20 @@ open class Visitor: BaseObject() {
 
 
 fun getControllerClass(kClass: KClass<Visitor>): KClass<VisitorController>{
+    if (!kClass.isSubclassOf(Visitor::class))
+        throw EtiOPFException("%s is not a subclass of Visitor".format(kClass.qualifiedName))
+    var theClass = kClass
     if (kClass.companionObjectInstance != null && kClass.companionObjectInstance is IVisitor)
         return (kClass.companionObjectInstance as IVisitor).visitorControllerClass()
+    while (theClass != Visitor::class){
+      theClass.superclasses.forEach {
+          if (it.companionObjectInstance != null && it.companionObjectInstance is IVisitor)
+              return (it.companionObjectInstance as IVisitor).visitorControllerClass()
+          if (it.isSubclassOf(Visitor::class))
+              theClass = it as KClass<Visitor>
+      }
+
+    }
 
     // at least return something
     return VisitorController::class

@@ -9,16 +9,23 @@ import kotlin.reflect.KClass
 // from this level and below - ObjectVisitorController does this for you.
 // Adds a pooled database connection
 open class ObjectVisitor: Visitor() {
-    companion object {
-        fun visitorControllerClass(): KClass<VisitorController> {
+    companion object: IVisitor  {
+        override  fun visitorControllerClass(): KClass<VisitorController> {
             return ObjectVisitorController::class as KClass<VisitorController>
         }
     }
-    override var visited: Object? = null
-    protected fun logQueryTiming(queryName: String, queryTime: Int, scanTime: Int){
+    override var visited: Object?
+    get() {
+        return if (privVisited != null)
+            privVisited as Object
+        else
+            null
+    }
+    set(value) {privVisited = value}
+    internal fun logQueryTiming(queryName: String, queryTime: ULong, scanTime: Int){
         val lClassName = this::class.simpleName
-        val classNames = arrayOf( "VisReadGRoupPK",
-            "VisReqdQueryPK",
+        val classNames = arrayOf( "VisReadGroupPK",
+            "VisReadQueryPK",
             "VisReadQueryDetail",
             "VisReadParams",
             "VisReadQueryByName")

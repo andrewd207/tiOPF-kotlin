@@ -1,9 +1,6 @@
 package tiOPF
 //complete
 
-import kotlin.reflect.KClass
-import kotlin.reflect.full.companionObject
-
 interface IPersistenceLayerClass{
     fun createInstance(): PersistenceLayer { throw Exception("persistence layer companion must implement createInstance")}}
 
@@ -38,8 +35,8 @@ abstract class PersistenceLayer: Object(){
             return result
         }
 
-    abstract val databaseClass: IDatabaseClass
-    abstract val queryClass: IQueryClass
+    abstract val databaseCompanion: IDatabaseCompanion
+    abstract val queryCompanion: IQueryCompanion
     var dynamicallyLoaded: Boolean = false
     var moduleId: Int = 0 // HModule?!
     var defaultDBConnectionName: String
@@ -62,16 +59,16 @@ abstract class PersistenceLayer: Object(){
         get() = persistenceLayerName
 
     fun databaseExists(databaseName: String, userName: String, password: String, params: String = ""): Boolean{
-        return  databaseClass.databaseExists(databaseName, userName, password, params)
+        return  databaseCompanion.databaseExists(databaseName, userName, password, params)
     }
     fun createDatabase(databaseName: String, userName: String, password: String, params: String = ""){
-        databaseClass.createDatabase(databaseName,userName, password, params)
+        databaseCompanion.createDatabase(databaseName,userName, password, params)
     }
     fun dropDatabase(databaseName: String, userName: String, password: String, params: String = ""){
-        databaseClass.dropDatabase(databaseName,userName, password, params)
+        databaseCompanion.dropDatabase(databaseName,userName, password, params)
     }
     fun testConnectionToDatabase(databaseName: String, userName: String, password: String, params: String): Boolean{
-        return  databaseClass.testConnectTo(databaseName, userName, password, params)
+        return  databaseCompanion.testConnectTo(databaseName, userName, password, params)
     }
 
     abstract fun assignPersistenceLayerDefaults(defaults: PersistanceLayerDefaults)

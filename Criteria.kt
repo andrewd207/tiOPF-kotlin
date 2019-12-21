@@ -203,7 +203,7 @@ open class Criteria(name: String = ""): Object() {
     }
 
     internal fun asSql(params: QueryParams, withComments: Boolean = false): String{
-        var result = ""
+        var result: String
         if (!hasCriteria)
             return ""
         val visitor = VisObjectToSQL(withComments)
@@ -278,7 +278,7 @@ abstract class SelectionCriteriaAbs(@Published var attribute: String, @Published
 
     protected open fun toSelectClause(params: QueryParams? = null, paramNo: ValueReference<Int>? = null): String{
         // do nothing. not all classes will implement this
-        var result = ""
+        var result: String
         if (params != null && paramNo != null){
             result = fieldName + getClause() + getParamName(paramNo.value, true)
             params.setParamAsString(getParamName(paramNo.value, false), value.toString())
@@ -366,7 +366,7 @@ class InCriteria(attribute: String, value: Any, isNegative: Boolean = false, fie
     }
     var valueArray: Array<Any> = arrayOf()
     override fun toSelectClause(params: QueryParams?, paramNo: ValueReference<Int>?): String {
-        var result = ""
+        var result: String
         var sep = ""
         if (valueArray.isNotEmpty() ){
             result = fieldName + getClause() + "("
@@ -431,10 +431,10 @@ class BetweenCriteria(attribute: String, value1: Any, val value2: Any, isNegativ
     }
 
     override fun toSelectClause(params: QueryParams?, paramNo: ValueReference<Int>?): String {
-        var result = ""
+        var result: String
         if (params != null){
-            var result = fieldName+getClause()+ getParamName(paramNo!!.value, true)
-                    " AND " + getParamName(paramNo!!.value+1, true )
+            result = fieldName+getClause()+ getParamName(paramNo!!.value, true)
+                    " AND " + getParamName(paramNo.value+1, true )
             params.setValueAsString(getParamName(paramNo.value, false), value.toString())
             params.setValueAsString(getParamName(paramNo.value+1, false), value2.toString())
             paramNo.value+=2

@@ -4,6 +4,8 @@ import java.time.ZonedDateTime
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.reflect.KClass
 
+const val CErrorUnableToFindPerLayer = "Unable to find persistence layer <%s>"
+
 var UOPFManager: OPFManager? = null
 var UShuttingDown: Boolean = false
 
@@ -68,5 +70,30 @@ class OPFManager: Object() {
             return privClassDBMappingManager!!
         }
 
+    fun connectDatabase(databaseName: String, username: String, password: String, params: String, persistanceLayerName: String){
+        connectDatabase("", databaseName, username, password, params, persistanceLayerName)
+    }
+
+    fun connectDatabase(databaseName: String, username: String, password: String, params: String){
+        connectDatabase("", databaseName, username, password, params, "")
+    }
+    fun connectDatabase(databaseName: String, username: String, password: String){
+        connectDatabase("", databaseName, username, password, "", "")
+    }
+
+    fun connectDatabase(databaseAlias: String, databaseName: String, username: String, password: String, params: String, persistanceLayerName: String){
+        val lPersistanceLayer =
+            (if ( persistanceLayerName.isEmpty())
+                defaultPerLayer
+            else
+                persistanceLayers.findByPersistanceLayerName(persistanceLayerName))
+                ?: throw EtiOPFException(CErrorUnableToFindPerLayer.format(persistanceLayerName))
+
+        lPersistanceLayer.dbConnectionPools.connect(databaseAlias, databaseName, username, password, params)
+
+        if (lPersistanceLayer.defaultDBConnectionName.isEmpty())
+            lPersistanceLayer.defaultDBConnectionName = databaseName
+
+    }
 
 }

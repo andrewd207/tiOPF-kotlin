@@ -29,7 +29,7 @@ open class DBMetadataTable: ObjectList<DBMetadataField>() {
 
         val database: Database = GTIOPFManager().persistanceLayers.lockDatabase(dbConnectionName, persistenceLayerName)
         try {
-            database!!.readMetadataFields(this)
+            database.readMetadataFields(this)
         }
         finally {
             GTIOPFManager().persistanceLayers.unlockDatabase(database, dbConnectionName, persistenceLayerName)

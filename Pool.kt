@@ -128,11 +128,11 @@ abstract class Pool(val minPoolSize: Int, val maxPoolSize: Int): BaseObject(){
         }
 
     }
-    protected abstract fun pooledItemClass(): KClass<*>
+    protected abstract fun pooledItemInterface(): IPooledItemClass
     protected abstract fun afterAddPooledItem(item: PooledItem)
     protected fun addItem(): PooledItem{
-        val result = (pooledItemClass().companionObject as IPooledItemClass).createInstance(this)
-        LOG("Attempting to add pooled item #$count", LogSeverity.lsConnectionPool)
+        val result = pooledItemInterface().createInstance(this)
+        LOG("Attempting to add pooled item #$count",LogSeverity.lsConnectionPool)
         val list = pool.lockList()
         try {
             afterAddPooledItem(result)

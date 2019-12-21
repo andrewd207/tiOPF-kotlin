@@ -1,11 +1,12 @@
 package tiOPF
 // complete
+import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
-interface IDatabaseClass {
+interface IDatabaseCompanion {
     fun createInstance(): Database{
-        throw Exception("companion must implement IDatabaseClass.createInstance()")
+        throw Exception("companion must implement IDatabaseCompanion.createInstance()")
     }
     fun databaseExists(databaseName: String, userName: String, password: String, params: String = ""): Boolean{return false}
     fun createDatabase(databaseName: String, userName: String, password: String, params: String = ""){}
@@ -18,13 +19,13 @@ interface IDatabaseClass {
 }
 
 abstract class Database: BaseObject() {
-    companion object: IDatabaseClass
+    companion object: IDatabaseCompanion
     var databaseName = ""
     var userName = ""
     var password = ""
     abstract var connected: Boolean
     var errorInLastCall = false
-    protected val params = List<String>()
+    protected val params = Properties()
 
     abstract fun startTransaction()
     abstract fun inTransaction(): Boolean
@@ -33,11 +34,11 @@ abstract class Database: BaseObject() {
     abstract fun test(): Boolean
     abstract fun queryClass(): KClass<Query>
     fun createQuery(): Query{
-        assert(queryClass() != null, {"queryClass not assigned"})
+        assert(queryClass() != null, {"queryCompanion not assigned"})
         return queryClass().primaryConstructor!!.call()
     }
     fun createAndAttachQuery(): Query{
-        assert(queryClass() != null, {"queryClass not assigned"})
+        assert(queryClass() != null, {"queryCompanion not assigned"})
         val result: Query = queryClass().primaryConstructor!!.call()
         result.attachDatabase(this)
         return result
@@ -133,9 +134,12 @@ abstract class Database: BaseObject() {
         this.userName = userName
         this.password = password
 
-        val paramsList = params.split(",").map { it.trim() }
-        paramsList.forEach{
-            this.params.add(it)
+        if (params.isNotEmpty()) {
+            val paramsList = params.split(",").map { it.trim() }
+            paramsList.forEach {
+                val list = it.split("=")
+                this.params.setProperty(list[0], list[1])
+            }
         }
 
         // if verboseDBConnection

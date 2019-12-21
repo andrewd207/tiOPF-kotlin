@@ -1,6 +1,11 @@
 package tiOPF
 
+import java.io.File
+import java.io.File.separator
 import kotlin.reflect.KClass
+
+const val CDefaultDatabaseName = "Demo"
+      val CDefaultDatabaseDirectory = ".. $separator _Data $separator"
 
 class PersistenceLayers: ObjectList<PersistenceLayer>() {
     enum class LoadingStyle {StaticLinking, DynamicLoading}
@@ -18,7 +23,7 @@ class PersistenceLayers: ObjectList<PersistenceLayer>() {
     fun findByDatabaseClass(klass: KClass<*>): PersistenceLayer?{
         assert(klass != null, { "database class != null "})
         forEach {
-            if (it.databaseClass.klass() == klass)
+            if (it.databaseCompanion.klass() == klass)
                 return it
         }
         return null
@@ -66,7 +71,7 @@ class PersistenceLayers: ObjectList<PersistenceLayer>() {
         if (persistenceLayer == null)
             throw Exception("Request for unregistered persistence layer <$layerName>")
         else
-            return persistenceLayer.queryClass.createInstance()
+            return persistenceLayer.queryCompanion.createInstance()
 
     }
     fun createQuery(databaseClass: KClass<Database>): Query{
@@ -74,19 +79,20 @@ class PersistenceLayers: ObjectList<PersistenceLayer>() {
         if (persistenceLayer == null)
             throw Exception("Unable to find persistence layer for database class <${databaseClass.simpleName}>")
         else
-            return persistenceLayer.queryClass.createInstance()
+            return persistenceLayer.queryCompanion.createInstance()
     }
     fun createDatabase(layerName: String): Database{
         val persistenceLayer = findByPersistanceLayerName(layerName)
         if (persistenceLayer == null)
             throw Exception("Request for unregistered persistence layer <$layerName>")
         else
-            return persistenceLayer.databaseClass.createInstance()
+            return persistenceLayer.databaseCompanion.createInstance()
     }
 
     // Do not call these yourself. They are called in the initialization section
     // of QueryXXX.kt that contains the concrete classes.
     fun __registerPersistenceLayer(persistenceLayerClass: IPersistenceLayerClass){
+        println("Registered Layer per ${persistenceLayerClass.createInstance().persistenceLayerName}")
         assert(persistenceLayerClass != null, { "persistenceLayerClass not assigned"})
         val data = persistenceLayerClass.createInstance()
         if (!isLoaded(data.persistenceLayerName))

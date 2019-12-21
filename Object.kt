@@ -165,7 +165,7 @@ open class Object(): Visited(), IObject<Object> {
         val list = List<String>()
         getPropertyNames(this, list, localFilter)
         list.forEach {
-            println("assigning $it")
+            //println("assigning $it")
             if (isReadWriteProp(it) && isPublishedProp(this::class, it)){
                 try {
 
@@ -217,11 +217,11 @@ open class Object(): Visited(), IObject<Object> {
         GTIOPFManager().visitorManager.execute(CuStandardTask_ReadThis,this, dbConnectionName, persistenceLayerName)
     }
 
-    open fun save(dbConnectionName: String, persistenceLayerName: String = ""){
-        GTIOPFManager().visitorManager.execute(CuStandardTask_Save,this, dbConnectionName, persistenceLayerName)
-    }
     open fun save(){
         save( "", "")
+    }
+    open fun save(dbConnectionName: String, persistenceLayerName: String = ""){
+        GTIOPFManager().visitorManager.execute(CuStandardTask_Save,this, dbConnectionName, persistenceLayerName)
     }
 
     open fun <T>getPropValue(propName: String): T?{

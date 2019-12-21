@@ -4,12 +4,12 @@ import java.util.Date
 import java.time.LocalDate
 
 
-interface IQueryClass{
+interface IQueryCompanion{
     fun createInstance(): Query
 }
 
 abstract class Query: BaseObject() {
-    companion object: IQueryClass{
+    companion object: IQueryCompanion{
         override fun createInstance(): Query {
             throw Exception("abstract class \"Query\" cannot be used directly")
         }
@@ -37,7 +37,7 @@ abstract class Query: BaseObject() {
     }
 
     open val supportsRowsAffected: Boolean = false
-    abstract var sql: List<String>
+    abstract val sql: List<String>
     open var sqlText: String = ""
     abstract var active: Boolean
     abstract val eof: Boolean
@@ -89,17 +89,17 @@ abstract class Query: BaseObject() {
     abstract fun setFieldAsDate(name: String, value: LocalDate)
     abstract fun getFieldIsNull(name: String): Boolean
     // Fields by Integer
-    abstract fun getFieldAsString(index: Long): String
-    abstract fun setFieldAsString(index: Long, value: String)
-    abstract fun getFieldAsFloat(index: Long): Double
-    abstract fun setFieldAsFloat(index: Long, value: Double)
-    abstract fun getFieldAsBoolean(index: Long): Boolean
-    abstract fun setFieldAsBoolean(index: Long, value: Boolean)
-    abstract fun getFieldAsInteger(index: Long): Long
-    abstract fun setFieldAsInteger(index: Long, value: Long)
-    abstract fun getFieldAsDate(index: Long): LocalDate
-    abstract fun setFieldAsDate(index: Long, value: LocalDate)
-    abstract fun getFieldIsNull(index: Long): Boolean
+    abstract fun getFieldAsString(index: Int): String
+    abstract fun setFieldAsString(index: Int, value: String)
+    abstract fun getFieldAsFloat(index: Int): Double
+    abstract fun setFieldAsFloat(index: Int, value: Double)
+    abstract fun getFieldAsBoolean(index: Int): Boolean
+    abstract fun setFieldAsBoolean(index: Int, value: Boolean)
+    abstract fun getFieldAsInteger(index: Int): Long
+    abstract fun setFieldAsInteger(index: Int, value: Long)
+    abstract fun getFieldAsDate(index: Int): LocalDate
+    abstract fun setFieldAsDate(index: Int, value: LocalDate)
+    abstract fun getFieldIsNull(index: Int): Boolean
 
     abstract fun open()
     abstract fun close()
@@ -115,18 +115,18 @@ abstract class Query: BaseObject() {
     abstract fun paramCount(): Long
     abstract fun paramName(index: Long): String
 
-    abstract fun fieldCount(): Long
+    abstract fun fieldCount(): Int
     abstract fun fieldName(index: Long): String
-    abstract fun fieldIndex(name: String): Long
-    abstract fun fieldKind(index: Long): QueryFieldKind
-    abstract fun fieldSize(index: Long): Long
+    abstract fun fieldIndex(name: String): Int
+    abstract fun fieldKind(index: Int): QueryFieldKind
+    abstract fun fieldSize(index: Int): Long
     abstract fun hasNativeLogicalType(): Boolean
 
     //abstract fun assignParamFromStream(name: String, stream: Stream<Char>)
     //abstract fun assignParamToStream(name: String, stream: Stream<Char>)
 
     abstract fun assignFieldAsByteArray(name: String, data: ValueOut<ByteArray>)
-    abstract fun assignFieldAsByteArray(index: Long, data: ValueOut<ByteArray>)
+    abstract fun assignFieldAsByteArray(index: Int, data: ValueOut<ByteArray>)
 
     open fun attachDatabase(database: Database){
         this.database = database
@@ -164,9 +164,23 @@ abstract class Query: BaseObject() {
         return result
     }
 
-    abstract val queryType: QueryType
-
-
+    open val queryType: QueryType
+        get() {
+            var sql = sqlText.toLowerCase().trim()
+            sql = sql.replace('\n', ' ')
+            val p = sql.indexOf(' ')
+            sql = sql.substring(0, p)
+            return when (sql){
+                "select" -> QueryType.Select
+                "insert" -> QueryType.Insert
+                "update" -> QueryType.Update
+                "delete" -> QueryType.Delete
+                "create" -> QueryType.DDL
+                "alter" -> QueryType.DDL
+                "drop" -> QueryType.DDL
+                else -> throw Exception(CTIOPFExcCanNotDetermineSQLType.format(sql))
+            }
+        }
 }
 fun queryFieldKindToString(kind: Query.QueryFieldKind): String{
     return kind.name
