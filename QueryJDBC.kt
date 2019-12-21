@@ -43,8 +43,10 @@ open class QueryJDBC : QuerySQL(){
             var i = start
             var cont = true
             while (cont) {
-                val isChar = (text[i] in 'a'..'z' || text[i] in 'A'..'Z' || text[i] == '_')
-                if (i < text.lastIndex && isChar)
+
+
+                val isChar = (i <= text.lastIndex && (text[i] in 'a'..'z' || text[i] in 'A'..'Z' || text[i] == '_'))
+                if (i <= text.lastIndex && isChar)
                     i++
                 else {
                     val end = i
@@ -203,11 +205,11 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun getFieldAsString(name: String): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return resultSet!!.getString(name)
     }
 
     override fun getFieldAsString(index: Int): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return resultSet!!.getString(index)
     }
 
     override fun setFieldAsString(name: String, value: String) {
@@ -219,11 +221,11 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun getFieldAsFloat(name: String): Double {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return resultSet!!.getFloat(name).toDouble()
     }
 
     override fun getFieldAsFloat(index: Int): Double {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return resultSet!!.getFloat(index).toDouble()
     }
 
     override fun setFieldAsFloat(name: String, value: Double) {
@@ -235,11 +237,11 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun getFieldAsBoolean(name: String): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return resultSet!!.getBoolean(name)
     }
 
     override fun getFieldAsBoolean(index: Int): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return resultSet!!.getBoolean(index)
     }
 
     override fun setFieldAsBoolean(name: String, value: Boolean) {
@@ -251,11 +253,11 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun getFieldAsInteger(name: String): Long {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return resultSet!!.getLong(name)
     }
 
     override fun getFieldAsInteger(index: Int): Long {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return resultSet!!.getLong(index)
     }
 
     override fun setFieldAsInteger(name: String, value: Long) {
@@ -267,6 +269,7 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun getFieldAsDate(name: String): LocalDate {
+        //return resultSet!!.getDate(name)
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -283,15 +286,55 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun getFieldIsNull(name: String): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val index = resultSet!!.findColumn(name)
+        return getFieldIsNull(index)
     }
 
     override fun getFieldIsNull(index: Int): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val type = resultSet!!.metaData.getColumnType(index)
+        when (type) {
+            //Types.BLOB
+            //    -> { return true}
+            Types.BIGINT,
+            Types.SMALLINT,
+            Types.INTEGER
+            -> {
+                getFieldAsInteger(index)
+                return resultSet!!.wasNull()
+            }
+            Types.FLOAT,
+            Types.DOUBLE,
+            Types.DECIMAL
+            -> {
+                getFieldAsFloat(index)
+                return resultSet!!.wasNull()
+            }
+            Types.BIT,
+            Types.BOOLEAN
+            -> {
+                getFieldAsBoolean(index)
+                return resultSet!!.wasNull()
+            }
+            Types.CHAR,
+            Types.VARCHAR
+            -> {
+                getFieldAsString(index)
+                return resultSet!!.wasNull()
+            }
+            Types.DATE
+            -> {
+                resultSet!!.getDate(index)
+                return resultSet!!.wasNull()
+
+            }
+        }
+
+        throw Exception("Unhandled field type: %s".format(type.toString()))
     }
 
     override fun open() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        resultSet = statement!!.executeQuery()
+        resultSet?.next()
     }
 
     override fun assignFieldAsByteArray(index: Int, data: ValueOut<ByteArray>) {
@@ -332,15 +375,21 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun next() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        resultSet!!.next()
     }
 
     override fun paramCount(): Long {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return sqlParamMap.size.toLong()
     }
 
     override fun paramName(index: Long): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        var result = ""
+        sqlParamMap.forEach { (name, i) ->
+            if (i == index.toInt())
+                result = name
+                return@forEach
+        }
+        return result
     }
 
     override fun fieldCount(): Int {
@@ -350,7 +399,11 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun fieldName(index: Long): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return (
+            if (resultMetadata != null)
+                resultMetadata!!.getColumnName(index.toInt())
+            else
+               "")
     }
 
     override fun fieldIndex(name: String): Int {
@@ -397,7 +450,7 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun fieldSize(index: Int): Long {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return 0
     }
 
     override fun hasNativeLogicalType(): Boolean {

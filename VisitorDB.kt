@@ -7,6 +7,43 @@ abstract class VisOwnedQrySelectAbs: ObjectVisitor(){
     }
     protected open fun afterRow(){}
     protected abstract fun openQuery()
+    override fun execute(visited: Visited?) {
+        fun scanQuery(){
+            query!!.continueScan = true
+            while (!query!!.eof && query!!.continueScan &&  !GTIOPFManager().terminated){
+                beforeRow()
+                mapRowToObject()
+                afterRow()
+                query!!.next()
+            }
+        }
+        if (GTIOPFManager().terminated)
+            return
+        super.execute(visited)
+
+        if (!acceptVisitor())
+            return
+        assert(database != null, {"Database connection not set"})
+
+        if (visited != null)
+            this.visited = visited as Object
+        else
+            this.visited = null
+
+        init()
+        setupParams()
+        var start = tiGetTickCount()
+        openQuery()
+        try {
+            val queryTime = tiGetTickCount() - start
+            start = tiGetTickCount()
+            scanQuery()
+            logQueryTiming(className(), queryTime, tiGetTickCount()-start)
+        }
+        finally {
+            query!!.close()
+        }
+    }
 }
 
 
@@ -40,7 +77,7 @@ open class VisitorUpdate: ObjectVisitor() {
             val rowsAffected = query!!.execSQL()
             if (query!!.supportsRowsAffected)
                 afterExecSql(rowsAffected.toInt())
-            logQueryTiming(className(), tiGetTickCount() - start, 0)
+            logQueryTiming(className(), tiGetTickCount() - start, 0.toULong())
         }
         finally {
             unInit()

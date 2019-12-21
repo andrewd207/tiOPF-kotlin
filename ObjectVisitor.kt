@@ -22,7 +22,7 @@ open class ObjectVisitor: Visitor() {
             null
     }
     set(value) {privVisited = value}
-    internal fun logQueryTiming(queryName: String, queryTime: ULong, scanTime: Int){
+    internal fun logQueryTiming(queryName: String, queryTime: ULong, scanTime: ULong){
         val lClassName = this::class.simpleName
         val classNames = arrayOf( "VisReadGroupPK",
             "VisReadQueryPK",
