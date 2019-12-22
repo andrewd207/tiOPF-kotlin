@@ -16,4 +16,9 @@ class ObjectVisitorSetObjectStateToDelete: Visitor() {
         val lVisited = visited as Object
         return derivedParent == null || derivedParent == lVisited.owner
     }
+
+    override fun execute(visited: Visited?) {
+        super.execute(visited)
+        (visited as Object).objectState = Object.PerObjectState.Delete
+    }
 }

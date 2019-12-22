@@ -66,7 +66,8 @@ open class Object(): Visited(), IObject<Object> {
         }
         set(value) {
             if (value && !deleted){
-
+                val vis = ObjectVisitorSetObjectStateToDelete()
+                iterate(vis)
             }
         }
     open var dirty: Boolean
@@ -84,7 +85,7 @@ open class Object(): Visited(), IObject<Object> {
                     if (oid.isNull())
                         oidGenerator().assignNextOID(oid)
                 }
-                PerObjectState.PK -> objectState = PerObjectState.Create
+                PerObjectState.PK -> objectState = PerObjectState.Update
                 PerObjectState.Clean -> objectState = PerObjectState.Update
                 PerObjectState.Create,
                 PerObjectState.Update,
