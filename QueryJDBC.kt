@@ -333,6 +333,7 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun open() {
+        checkPrepared()
         resultSet = statement!!.executeQuery()
         resultSet?.next()
     }

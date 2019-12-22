@@ -20,7 +20,7 @@ const val CDefaultMinPoolSize = 1
 const val CDefaultMaxPoolSizeMultiUser = 9999
 const val CDefaultMaxPoolSizeSingleUser = 1
 
-const val CPersistJDBCFirebird = "JDBC_Firebird"
+//const val CPersistJDBCFirebird = "JDBC_Firebird"
 
 const val CPasswordMasked = "Password masked from view"
 const val CErrorInconsistentTableNames = "Inconsistent table names found in DBColMap"

@@ -11,9 +11,12 @@ class PersistenceLayers: ObjectList<PersistenceLayer>() {
     enum class LoadingStyle {StaticLinking, DynamicLoading}
     var loadingStyle = LoadingStyle.StaticLinking
     var defaultPersistenceLayer: PersistenceLayer? = null // TODO change default to subclass
-    fun defaultPersistenceLayerName(): String{
+    var defaultPersistenceLayerName: String
+    get() {
         return defaultPersistenceLayer!!.persistenceLayerName
     }
+    set(value) { defaultPersistenceLayer = findByPersistanceLayerName(value)}
+
     fun findByPersistanceLayerName(layerName: String): PersistenceLayer?{
         forEach {
             if (it.persistenceLayerName === layerName) return it
@@ -64,7 +67,7 @@ class PersistenceLayers: ObjectList<PersistenceLayer>() {
         return findByPersistanceLayerName(persistenceLayerName) != null
     }
     fun isDefault(persistenceLayerName: String): Boolean{
-        return defaultPersistenceLayerName().equals(persistenceLayerName, true)
+        return defaultPersistenceLayerName.equals(persistenceLayerName, true)
     }
     fun createQuery(layerName: String): Query{
         val persistenceLayer = findByPersistanceLayerName(layerName)

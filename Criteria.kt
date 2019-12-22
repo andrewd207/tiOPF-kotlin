@@ -8,6 +8,54 @@ enum class CriteriaType{
     NONE
 }
 
+fun tiCriteriaAsSQL(visited: Object, withComments: Boolean = false): String{
+    return tiCriteriaAsSQL(visited, null, withComments)
+}
+fun tiCriteriaAsSQL(visited: Object, params: QueryParams?, withComments: Boolean = false): String{
+    assert(visited is Criteria, {"Criteria subtype required"})
+
+    if (!(visited as Criteria).hasCriteria)
+        return ""
+    var result = ""
+
+    val visitor = VisObjectToSQL(withComments)
+    visitor.params = params
+    visited.iterate(visitor)
+
+    result = visitor.text
+
+    if (visited.isEmbraced && result.isNotEmpty())
+        result = "($result)\n"
+    else
+        result += "\n"
+
+    return result
+}
+
+fun tiCriteriaOrderByAsSQL(visited: Object): String {
+    assert(visited is Criteria,{"Criteria subtype required"})
+
+    if (! (visited as Criteria).hasOrderBy)
+        return ""
+    val cVisited = visited as Criteria
+    val orderByList = cVisited.orderByList
+
+    fun orderText(col: Int): String{
+        return if (orderByList[col].ascending)
+            orderByList[col].fieldName
+        else
+            orderByList[col].fieldName + " DESC"
+    }
+
+    var result = " ORDER BY ${orderText(0)}"
+    for (i in 1 until orderByList.count()){
+        result += ", ${orderText(i)}"
+    }
+    result += "\n"
+
+    return result
+}
+
 class CriteriaList: ObjectList<Criteria>(){
     val ownerAsCriteria: Criteria get() = owner as Criteria
 }

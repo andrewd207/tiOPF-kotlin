@@ -62,6 +62,8 @@ class PersistanceLayerFB: PersistanceLayerJDBC(){
         init {
             GTIOPFManager().persistanceLayers.__registerPersistenceLayer(this)
         }
+        // do not ust const!! otherwise it interrupts the init from registering the database
+        internal val layerName = "JDBC_Firebird"
     }
 
     override var persistenceLayerName = CPersistJDBCFirebird
@@ -83,3 +85,5 @@ class PersistanceLayerFB: PersistanceLayerJDBC(){
         defaults.canSupportSQL = true
     }
 }
+
+val CPersistJDBCFirebird = PersistanceLayerFB.layerName

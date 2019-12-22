@@ -30,22 +30,24 @@ class OPFManager: Object() {
     val activeThreadList = ActiveThreadList()
     val applicationData = List<Object>()
     val applicationStartTime = ZonedDateTime.now()
-    var defaultPerLayer: PersistenceLayer? = persistanceLayers.defaultPersistenceLayer
+    var defaultPerLayer: PersistenceLayer?
+        get() {return persistanceLayers.defaultPersistenceLayer}
+        set(value) {persistanceLayers.defaultPersistenceLayer = value}
     var defaultOIDGenerator: OIDGenerator = OIDGeneratorGUID()
-    val defaultPerLayerName: String
+    var defaultPerLayerName: String
         get() {
             if (defaultPerLayer != null)
                 return defaultPerLayer!!.persistenceLayerName
             return ""
         }
+        set(value) {persistanceLayers.defaultPersistenceLayerName = value}
     val defaultDBConnectionPool: DBConnectionPool? get() { return defaultPerLayer?.defaultDBConnectionPool }
     var defaultDBConnectionName: String
         get() {
-            var result = ""
             if (defaultPerLayer != null)
-                result = defaultPerLayer!!.defaultDBConnectionName
+                return defaultPerLayer!!.defaultDBConnectionName
 
-            return result
+            return ""
         }
         set(value) {
             if (defaultPerLayer != null)
@@ -71,14 +73,14 @@ class OPFManager: Object() {
         }
 
     fun connectDatabase(databaseName: String, username: String, password: String, params: String, persistanceLayerName: String){
-        connectDatabase("", databaseName, username, password, params, persistanceLayerName)
+        connectDatabase(databaseName, databaseName, username, password, params, persistanceLayerName)
     }
 
     fun connectDatabase(databaseName: String, username: String, password: String, params: String){
-        connectDatabase("", databaseName, username, password, params, "")
+        connectDatabase(databaseName, databaseName, username, password, params, "")
     }
     fun connectDatabase(databaseName: String, username: String, password: String){
-        connectDatabase("", databaseName, username, password, "", "")
+        connectDatabase(databaseName, databaseName, username, password, "", "")
     }
 
     fun connectDatabase(databaseAlias: String, databaseName: String, username: String, password: String, params: String, persistanceLayerName: String){

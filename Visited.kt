@@ -1,5 +1,6 @@
 package tiOPF
 // complete
+import java.lang.Exception
 import kotlin.reflect.KClass
 
 const val CErrorInvalidIterationStyle = "Invalid IterationStyle"
@@ -22,9 +23,13 @@ open class Visited: BaseObject(){
         try {
             iterateRecurse(visitor, null, touchedObjectList, this::touchMethodExecuteVisitor, 0)
         }
+        catch (e: Exception) {
+            println(e.message)
+        }
         finally {
             touchedByVisitorList.appendTopDown(touchedObjectList)
         }
+
     }
     protected fun iterateTopDownSinglePass(visitor: Visitor, touchedByVisitorList: TouchedByVisitorList){
         val touchedObjectList = TouchedByVisitorList()
