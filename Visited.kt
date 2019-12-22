@@ -80,17 +80,22 @@ open class Visited: BaseObject(){
             if (visitor.intAcceptVisitor(this))
                 touchMethod.invoke(this, visitor, touchedByVisitorList, theIterationDepth)
             val classPropNames = List<String>()
+
+            // the "items" property is not public
+            if ( this is MutableList<*>)
+                iterateOverList(visitor, this, this, touchedByVisitorList, touchMethod, theIterationDepth)
+
             getPropertyNames(this, classPropNames, setOf(TypeKind.OBJECT))
             classPropNames.forEach {
                 val candidate = getObjectProperty<Any>(this, it)
                 if (candidate is Visited)
                     candidate.iterateRecurse(visitor, this, touchedByVisitorList, touchMethod, theIterationDepth)
-                else if (candidate is List<*>)
+                else if (candidate is MutableList<*>)
                     iterateOverList(visitor, candidate, this, touchedByVisitorList, touchMethod, theIterationDepth)
             }
         }
     }
-    protected fun iterateOverList(visitor: Visitor, candidates: List<*>, derivedParent: Visited,
+    protected fun iterateOverList(visitor: Visitor, candidates: MutableList<*>, derivedParent: Visited,
                                   touchedByVisitorList: TouchedByVisitorList, touchMethod: VisitedTouchMethod,
                                   iterationDepth: Int){
         candidates.forEach {

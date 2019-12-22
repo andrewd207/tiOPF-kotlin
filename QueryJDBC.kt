@@ -461,14 +461,14 @@ open class QueryJDBC : QuerySQL(){
 
 interface IDatabaseJDBCCompanion: IDatabaseCompanion{
     val driver: Driver? get() {
-            var result: Driver?
             try{
-                result = DriverManager.getDriver(getDriverName())
+                return DriverManager.getDriver(getDriverName())
             }
             catch (e: Exception){
-                result = null
+                println(e.message)
+                return null
             }
-            return result
+        return null
         }
 
     fun connect(url: String, user: String, password: String, props: Properties): Connection? {
@@ -480,13 +480,13 @@ interface IDatabaseJDBCCompanion: IDatabaseCompanion{
         }
         return drv?.connect(url, props)
     }
-    fun getDriverName(): String{  // just the name i.e. "firebirdsql"
+    fun getDriverName(): String{  // just the name i.e. "jdbc:firebirdsql:"
         throw Exception("getDriverName is abstract")
     }
     override fun databaseExists(databaseName: String, userName: String, password: String, params: String): Boolean {
         val props = Properties()
         val connection =
-            DatabaseJDBC.connect("jdbc:${DatabaseJDBC.getDriverName()}://$databaseName", userName, password, props)
+            DatabaseJDBC.connect("${this.getDriverName()}//$databaseName", userName, password, props)
         var result: Boolean
         if ( connection != null) {
             connection.use { connection ->
@@ -533,9 +533,9 @@ abstract class DatabaseJDBC: DatabaseSQL(){
     companion object: IDatabaseJDBCCompanion
     private var privInTransaction = false
 
-    //private fun getDriverName(): String {
-    //    return (this::class.companionObjectInstance as IDatabaseJDBCCompanion).getDriverName()
-    //}
+    private fun getDriverName(): String {
+        return (this::class.companionObjectInstance as IDatabaseJDBCCompanion).getDriverName()
+    }
     internal var connection: Connection? = null
     override fun queryClass(): KClass<Query> {
         return QueryJDBC::class as KClass<Query>
@@ -572,7 +572,9 @@ abstract class DatabaseJDBC: DatabaseSQL(){
 
                 val companion = this::class.companionObjectInstance as IDatabaseJDBCCompanion
                 try {
-                    connection = companion.connect("jdbc:${companion.getDriverName()}://$dbHost/$dbName", userName, password, props)
+                    val url = "${companion.getDriverName()}//$dbHost/$dbName"
+                    println("connecting: $url")
+                    connection = companion.connect(url, userName, password, props)
                 }
                 catch (e: Exception){
                     throw EtiOPFDBExceptionUserNamePassword("jdbc", databaseName, userName, password, "Error attempting to connect to database.\n"+e.message)

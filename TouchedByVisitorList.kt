@@ -16,11 +16,16 @@ class TouchedByVisitorList: BaseObject() {
         list.add(item)
     }
     fun appendTopDown(list: TouchedByVisitorList){
-        //TODO
+        list.list.forEach {
+            add(it)
+
+        }
     }
 
     fun appendBottomUp(list: TouchedByVisitorList){
-        //TODO
+        list.list.forEach {
+            this.list.add(0, it)
+        }
     }
 
     fun items(index: Int): List<TouchedByVisitor>{
