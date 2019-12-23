@@ -1,7 +1,7 @@
 package tiOPF
 
 abstract class DatabaseSQL: Database() {
-    abstract fun fieldMetadataToSQLCreate(fieldMetadata: DBMetadataField)
+    abstract fun fieldMetadataToSQLCreate(fieldMetadata: DBMetadataField): String
     override fun dropTable(tableMetadata: DBMetadataTable) {
         val sql = "drop table ${tableMetadata.name}"
         execSQL(sql)

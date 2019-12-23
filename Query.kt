@@ -17,7 +17,9 @@ abstract class Query: BaseObject() {
     enum class QueryFieldKind {
         String,
         Integer,
+        Int64,
         Float,
+        Money,
         DateTime,
         Logical,
         Binary,

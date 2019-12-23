@@ -461,14 +461,8 @@ open class QueryJDBC : QuerySQL(){
 
 interface IDatabaseJDBCCompanion: IDatabaseCompanion{
     val driver: Driver? get() {
-            try{
-                return DriverManager.getDriver(getDriverName())
-            }
-            catch (e: Exception){
-                println(e.message)
-                return null
-            }
-        return null
+            return DriverManager.getDriver(getDriverName())
+            // may throw an exception but it's better to catch it somewhere else
         }
 
     fun connect(url: String, user: String, password: String, props: Properties): Connection? {
@@ -549,7 +543,7 @@ abstract class DatabaseJDBC: DatabaseSQL(){
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun fieldMetadataToSQLCreate(fieldMetadata: DBMetadataField) {
+    override fun fieldMetadataToSQLCreate(fieldMetadata: DBMetadataField):String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -573,14 +567,10 @@ abstract class DatabaseJDBC: DatabaseSQL(){
                 val companion = this::class.companionObjectInstance as IDatabaseJDBCCompanion
                 try {
                     val url = "${companion.getDriverName()}//$dbHost/$dbName"
-                    println("connecting: $url")
                     connection = companion.connect(url, userName, password, props)
                 }
                 catch (e: Exception){
-                    throw EtiOPFDBExceptionUserNamePassword("jdbc", databaseName, userName, password, "Error attempting to connect to database.\n"+e.message)
-                }
-                catch (e: Exception) {
-                    throw EtiOPFDBException("jdbc", databaseName, userName, password, "Error attempting to connect to database.\n${e.message}")
+                    throw EtiOPFDBExceptionUserNamePassword("jdbc\n", databaseName, userName, password, "Error attempting to connect to database.\n${e}")
                 }
             }
         }

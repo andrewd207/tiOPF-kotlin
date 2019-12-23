@@ -14,7 +14,8 @@ open class DBMetadataField: Object() {
             }
         }
     var width = 0
-
+    var notNull = false
+    var primaryKey = false
     protected fun getRPadName(): String{
         return name.padEnd((owner as DBMetadataTable).maxFieldNameWidth)
     }

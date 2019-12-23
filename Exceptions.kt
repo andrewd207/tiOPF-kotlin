@@ -19,12 +19,13 @@ const val CTIOPFUnsupportedFieldType          = "Unsupported field type: %s"
 open class EtiOPFException(message: String): Exception(message)
 
 class EtiOPFProgrammerException(message: String): EtiOPFException(message)
+class EtiOPFInternalException(message: String): EtiOPFException(message)
 open class EtiOPFDBException(persistenceLayerName: String, dbName: String, user: String, password: String, message: String = ""):
     EtiOPFException("Database name:     $dbName\n" +
                     "User name:         $user\n" +
                     "Password:          $password\n" +
-                    "Persistence layer: $persistenceLayerName"+
-                    { if (message.isNotEmpty()) "\nMessage:\n$message"})
+                    "Persistence layer: $persistenceLayerName\n"+
+                    "Message:           $message")
 
 open class EtiOPFDBExceptionCanNotConnect(persistenceLayerName: String, dbName: String, user: String, password: String, message: String = ""):
     EtiOPFDBException(persistenceLayerName, dbName, user, password, CTIOPFExcMsgCanNotConnectToDatabase+"\n"+message)
