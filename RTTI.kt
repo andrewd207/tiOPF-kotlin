@@ -24,6 +24,19 @@ fun getPropertyNames(instance: BaseObject, list: List<String>, propFilter: Set<T
     }
 }
 
+fun getPublishedPropertyNames(instance: BaseObject, list: MutableList<String>, fieldNameList: MutableList<String>? = null) =
+    getPublishedPropertyNames(instance::class, list, fieldNameList)
+
+fun getPublishedPropertyNames(kKlass: KClass<*>, list: MutableList<String>, fieldNameList: MutableList<String>? = null){
+    kKlass.memberProperties.forEach {
+        val annotation = it.findAnnotation<Published>()
+        if (annotation != null) {
+            list.add(it.name)
+            fieldNameList?.add(annotation.persistenceHint)
+        }
+    }
+}
+
 fun getPropertyClass(klass: KClass<*>, propName: String): KClass<*> {
 
     val property = klass.members.find { it.name === propName }
@@ -72,8 +85,8 @@ fun isPublishedProp(kClass: KClass<*>, propName: String): Boolean{
     val property = kClass.memberProperties.find { it.name.equals(propName) }
     property?: return false
 
-    //return property.findAnnotation<Published>() != null
-    return property.visibility == KVisibility.PUBLIC
+    return property.findAnnotation<Published>() != null
+    //return property.visibility == KVisibility.PUBLIC
 
 }
 

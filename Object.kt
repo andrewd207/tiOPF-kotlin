@@ -1,5 +1,6 @@
 package tiOPF
 
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.primaryConstructor
 
@@ -254,6 +255,10 @@ open class Object(): Visited(), IObject<Object> {
         val result = List<String>()
         getPropertyNames(this, result, propFilter)
         return result
+    }
+
+    protected fun getPublished(): Published?{
+        return this::class.findAnnotation()
     }
 
 }

@@ -1,3 +1,3 @@
 package tiOPF
 
-annotation class Published
+annotation class Published(val persistenceHint: String = "")
