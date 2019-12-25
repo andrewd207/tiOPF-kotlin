@@ -316,7 +316,8 @@ abstract class SelectionCriteriaAbs(@Published var attribute: String, @Published
             return field
         }
     override fun assignPublicProps(source: Object){
-        assert(testValid(source as SelectionCriteriaAbs, SelectionCriteriaAbs::class), { CTIErrorInvalidObject })
+        assert(source is SelectionCriteriaAbs, { CTIErrorInvalidObject })
+        source as SelectionCriteriaAbs
         super.assignPublicProps(source)
         fieldName = source.fieldName
         attribute = source.attribute

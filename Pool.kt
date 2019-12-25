@@ -162,7 +162,7 @@ abstract class Pool(val minPoolSize: Int, val maxPoolSize: Int): BaseObject(){
         try {
             for (n in list.size-1 downTo 0) {
                 val item = list[n]
-                assert(testValid(item, PooledItem::class), { CTIErrorInvalidObject })
+                assert(item is PooledItem, { CTIErrorInvalidObject })
                 list.remove(item)
             }
         }

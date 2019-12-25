@@ -13,15 +13,15 @@ open class VisitorController(protected val visitorManager: VisitorManager, prote
         //do nothing
     }
     open fun beforeExecuteVisitor(visitor: Visitor){
-        assert(testValid(visitor), { CTIErrorInvalidObject})
+        assert(visitor != null, { CTIErrorInvalidObject})
         //do nothing
     }
     open fun afterExecuteVisitor(visitor: Visitor){
-        assert(testValid(visitor), { CTIErrorInvalidObject})
+        assert(visitor != null, { CTIErrorInvalidObject})
         //do nothing
     }
     open fun afterExecuteVisitorGroup(touchedByVisitorList: TouchedByVisitorList){
-        assert(testValid(touchedByVisitorList), { CTIErrorInvalidObject})
+        assert(touchedByVisitorList != null, { CTIErrorInvalidObject})
         //do nothing
     }
     open fun afterExecuteVisitorGroupError(){

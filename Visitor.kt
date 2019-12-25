@@ -35,7 +35,7 @@ open class Visitor: BaseObject() {
         setVisited(value)
     }
     protected open fun setVisited(value: Visited){
-        assert(value.testValid(Visited::class, true), {CTIErrorInvalidObject})
+        assert(value == null || value is Visited, {CTIErrorInvalidObject})
         this.privVisited = value
     }
 
@@ -46,13 +46,11 @@ open class Visitor: BaseObject() {
         return true
     }
     protected open fun acceptVisitor(visited: Visited): Boolean{
-        assert(visited.testValid(), {CTIErrorInvalidObject})
         setVisited(visited)
         return acceptVisitor()
     }
     protected open fun visitBranch(derivedParent: Visited?, visited: Visited): Boolean{
-        assert(testValid(derivedParent, null, true), {CTIErrorInvalidObject})
-        assert(visited.testValid(), {CTIErrorInvalidObject})
+        assert(derivedParent == null || derivedParent is Visited, {CTIErrorInvalidObject})
         return true
     }
     internal fun intVisitBranch(derivedParent: Visited?, visited: Visited): Boolean{

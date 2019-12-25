@@ -37,7 +37,7 @@ class PersistenceLayers: ObjectList<PersistenceLayer>() {
         else
             defaultPersistenceLayer
 
-        assert(testValid(defaultPersistenceLayer, PersistenceLayer::class), { CTIErrorInvalidObject})
+        assert(defaultPersistenceLayer is PersistenceLayer, { CTIErrorInvalidObject})
 
         val dbConnectionName = {
             if (dbConnectionName.isNotEmpty())
@@ -57,7 +57,7 @@ class PersistenceLayers: ObjectList<PersistenceLayer>() {
         else
             regPerLayer = defaultPersistenceLayer!!
 
-        assert(testValid(regPerLayer, PersistenceLayer::class), { CTIErrorInvalidObject })
+        assert(regPerLayer is PersistenceLayer, { CTIErrorInvalidObject })
         var dbConnectionName = dbConnectionName
         if (dbConnectionName.isEmpty())
             dbConnectionName = regPerLayer.defaultDBConnectionName

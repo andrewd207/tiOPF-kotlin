@@ -2,7 +2,7 @@ package tiOPF
 
 class ObjectVisitorSetObjectStateToDelete: Visitor() {
     override fun acceptVisitor(visited: Visited): Boolean {
-        assert(visited.testValid(Object::class), { CTIErrorInvalidObject})
+        assert(visited is Object, { CTIErrorInvalidObject})
         val lVisited = visited as Object
         val result = lVisited.objectState != Object.PerObjectState.Deleted
 
@@ -11,8 +11,8 @@ class ObjectVisitorSetObjectStateToDelete: Visitor() {
     }
 
     override fun visitBranch(derivedParent: Visited?, visited: Visited): Boolean {
-        assert(testValid(derivedParent, Object::class, true), { CTIErrorInvalidObject})
-        assert(visited.testValid(Object::class), {CTIErrorInvalidObject})
+        assert(derivedParent == null || derivedParent is Object, { CTIErrorInvalidObject})
+        assert(visited is Object, {CTIErrorInvalidObject})
         val lVisited = visited as Object
         return derivedParent == null || derivedParent == lVisited.owner
     }

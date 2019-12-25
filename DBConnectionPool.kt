@@ -24,7 +24,7 @@ open class DBConnectionPool(protected val dbConnectionPools: DBConnectionPools, 
     }
 
     fun unlock(database: Database){
-        assert(testValid(database), { CTIErrorInvalidObject })
+        assert(database is Database, { CTIErrorInvalidObject })
         if (database.inTransaction())
             database.rollback()
         super.unlock(database)
@@ -32,8 +32,8 @@ open class DBConnectionPool(protected val dbConnectionPools: DBConnectionPools, 
     }
 
     fun detailsAsString(): String{
-        assert(testValid(dbConnectionPools, DBConnectionPools::class), { CTIErrorInvalidObject})
-        assert(testValid(dbConnectionPools.persistenceLayer, PersistenceLayer::class), { CTIErrorInvalidObject})
+        assert(dbConnectionPools is DBConnectionPools, { CTIErrorInvalidObject})
+        assert(dbConnectionPools.persistenceLayer is PersistenceLayer, { CTIErrorInvalidObject})
         val persistenceLayer = dbConnectionPools.persistenceLayer
         return "Persistence layer:   " + persistenceLayer.persistenceLayerName + tiLineEnd() +
         "Database alias:      " + databaseAlias + tiLineEnd() +

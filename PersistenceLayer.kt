@@ -21,7 +21,7 @@ abstract class PersistenceLayer: Object(){
       }
     var defaultDBConnectionPool: DBConnectionPool? = null
         get() {
-            assert(testValid(field, DBConnectionPool::class, true), { CTIErrorInvalidObject })
+            assert(field == null || field is DBConnectionPool, { CTIErrorInvalidObject })
             if (field != null)
                 return field
 
@@ -30,7 +30,7 @@ abstract class PersistenceLayer: Object(){
 
             val result = dbConnectionPools.get(0)
 
-            assert(testValid(result, DBConnectionPool::class), { CTIErrorInvalidObject })
+            assert(result is DBConnectionPool, { CTIErrorInvalidObject })
 
             return result
         }
@@ -49,7 +49,7 @@ abstract class PersistenceLayer: Object(){
         }
         set(value) {
             defaultDBConnectionPool = dbConnectionPools.find(value)
-            assert(testValid(defaultDBConnectionPool, DBConnectionPool::class, true), { CTIErrorInvalidObject})
+            assert(defaultDBConnectionPool == null || defaultDBConnectionPool is DBConnectionPool, { CTIErrorInvalidObject})
         }
 
 

@@ -23,7 +23,7 @@ open class QueryParamString: QueryParamAbs(){
         }
 
     override fun assignToTIQuery(query: Query) {
-        assert(tiOPF.testValid(query, Query::class), { CTIErrorInvalidObject})
+        assert(query is Query, { CTIErrorInvalidObject})
         query.setParamAsString(name, valueAsString)
     }
 }
@@ -42,7 +42,7 @@ open class QueryParamInteger: QueryParamAbs() {
         }
 
     override fun assignToTIQuery(query: Query) {
-        assert(tiOPF.testValid(query, Query::class), { CTIErrorInvalidObject})
+        assert(query is Query, { CTIErrorInvalidObject})
         query.setParamAsInteger(name, valueInt)
     }
 }
@@ -61,7 +61,7 @@ open class QueryParamFloat: QueryParamAbs() {
         }
 
     override fun assignToTIQuery(query: Query) {
-        assert(tiOPF.testValid(query, Query::class), { CTIErrorInvalidObject})
+        assert(query is Query, { CTIErrorInvalidObject})
         query.setParamAsFloat(name, valueAsFloat)
     }
 }
@@ -80,7 +80,7 @@ open class QueryParamDateTime: QueryParamAbs() {
         }
 
     override fun assignToTIQuery(query: Query) {
-        assert(tiOPF.testValid(query, Query::class), { CTIErrorInvalidObject})
+        assert(query is Query, { CTIErrorInvalidObject})
         query.setParamAsDate(name, valueAsDateTime)
     }
 }
@@ -103,7 +103,7 @@ open class QueryParamBoolean: QueryParamAbs() {
 
 
     override fun assignToTIQuery(query: Query) {
-        assert(tiOPF.testValid(query, Query::class), { CTIErrorInvalidObject})
+        assert(query is Query, { CTIErrorInvalidObject})
         query.setParamAsBoolean(name, valueAsBoolean)
     }
 }
@@ -124,7 +124,7 @@ open class QueryParamBlob: QueryParamAbs() {
             isNull = false
         }
     override fun assignToTIQuery(query: Query) {
-        assert(tiOPF.testValid(query, Query::class), { CTIErrorInvalidObject})
+        assert(query is Query, { CTIErrorInvalidObject})
         query.setParamAsMacro(name, valueByteArray)
     }
 }

@@ -32,7 +32,7 @@ abstract class FieldAbs(private var owner: Object,
     open var fieldName: String
         get() {
             if (privFieldName.isEmpty()){
-                assert(testValid(owner, Object::class), { CTIErrorInvalidObject})
+                assert(owner is Object, { CTIErrorInvalidObject})
                 val list = List<String>()
                 getPropertyNames(owner, list, setOf(TypeKind.OBJECT))
                 list.forEach {
@@ -50,7 +50,7 @@ abstract class FieldAbs(private var owner: Object,
         set(value) { privFieldName = value }
 
     open fun isValidValue(errors: ObjectErrorList? = null): Boolean{
-        assert(testValid(owner), { CTIErrorInvalidObject})
+        assert(owner is Object, { CTIErrorInvalidObject})
         val result = nullValidation == NullValidation.AllowNull || !isNull
         errors?.addError(fieldName, CErrorFieldNotAssigned.format(owner.className()+"."+fieldName, owner.oid))
         return result
@@ -84,12 +84,12 @@ open class FieldString(owner: Object, nullValidation: NullValidation, val maxLen
     }
 
     override fun equals(compareWith: FieldAbs): Boolean {
-        assert(testValid(FieldString::class), { CTIErrorInvalidObject })
+        assert(this is FieldString, { CTIErrorInvalidObject })
         return isNull == compareWith.isNull && asString === compareWith.asString
     }
 
     override fun assign(assignFrom: FieldAbs) {
-        assert(testValid(FieldString::class), { CTIErrorInvalidObject })
+        assert(this is FieldString, { CTIErrorInvalidObject })
         if (assignFrom.isNull)
             isNull = true
         else
@@ -116,7 +116,7 @@ open class FieldStringMethod(owner: Object, val readMethod: StringFieldMethodRea
         }
 
     override fun equals(compareWith: FieldAbs): Boolean {
-        assert(compareWith.testValid(FieldString::class), { CTIErrorInvalidObject })
+        assert(compareWith is FieldString, { CTIErrorInvalidObject })
         return asString.equals(compareWith.asString)
     }
 
@@ -169,12 +169,12 @@ open class FieldInteger(owner: Object, nullValidation: NullValidation, val maxDi
     }
 
     override fun equals(compareWith: FieldAbs): Boolean {
-        assert(testValid(compareWith, FieldInteger::class), { CTIErrorInvalidObject })
+        assert(compareWith is FieldInteger, { CTIErrorInvalidObject })
         return isNull == compareWith.isNull && asInteger == (compareWith as FieldInteger).asInteger
     }
 
     override fun assign(assignFrom: FieldAbs) {
-        assert(testValid(assignFrom, FieldInteger::class), { CTIErrorInvalidObject })
+        assert(assignFrom is FieldInteger, { CTIErrorInvalidObject })
         if (assignFrom.isNull)
             isNull = true
         else
@@ -222,12 +222,12 @@ open class FieldFloat(owner: Object, nullValidation: NullValidation, precision: 
         }
 
     override fun equals(compareWith: FieldAbs): Boolean {
-        assert(testValid(compareWith, FieldFloat::class), { CTIErrorInvalidObject })
+        assert(compareWith is FieldFloat, { CTIErrorInvalidObject })
         return isNull == compareWith.isNull && asFloat == (compareWith as FieldFloat).asFloat && compareWith.epsilon == epsilon
     }
 
     override fun assign(assignFrom: FieldAbs) {
-        assert(testValid(assignFrom, FieldFloat::class), { CTIErrorInvalidObject })
+        assert(assignFrom is FieldFloat, { CTIErrorInvalidObject })
         if (assignFrom.isNull)
             isNull = true
         else {
@@ -295,12 +295,12 @@ open class FieldCurrency(owner: Object, nullValidation: NullValidation = NullVal
         set(value) { privValue = (value * 100).toLong() }
 
     override fun equals(compareWith: FieldAbs): Boolean {
-        assert(testValid(compareWith, FieldCurrency::class), { CTIErrorInvalidObject })
+        assert(compareWith is FieldCurrency, { CTIErrorInvalidObject })
         return isNull == compareWith.isNull && asInteger == (compareWith as FieldInteger).asInteger
     }
 
     override fun assign(assignFrom: FieldAbs) {
-        assert(testValid(assignFrom, FieldCurrency::class), { CTIErrorInvalidObject })
+        assert(assignFrom is FieldCurrency, { CTIErrorInvalidObject })
         if (assignFrom.isNull)
             isNull = true
         else
@@ -355,12 +355,12 @@ open class FieldBoolean(owner: Object, nullValidation: NullValidation = NullVali
         }
 
     override fun equals(compareWith: FieldAbs): Boolean {
-        assert(testValid(compareWith, FieldBoolean::class), { CTIErrorInvalidObject })
+        assert(compareWith is FieldBoolean, { CTIErrorInvalidObject })
         return isNull == compareWith.isNull && asBoolean == (compareWith as FieldBoolean).asBoolean
     }
 
     override fun assign(assignFrom: FieldAbs) {
-        assert(testValid(assignFrom, FieldBoolean::class), { CTIErrorInvalidObject })
+        assert(assignFrom is FieldBoolean, { CTIErrorInvalidObject })
         if (assignFrom.isNull)
             isNull = true
         else
@@ -422,12 +422,12 @@ open class FieldDate(owner: Object, nullValidation: NullValidation = NullValidat
 
 
     override fun equals(compareWith: FieldAbs): Boolean {
-        assert(testValid(compareWith, FieldDate::class), { CTIErrorInvalidObject })
+        assert(compareWith is FieldDate, { CTIErrorInvalidObject })
         return isNull == compareWith.isNull && asDate == (compareWith as FieldDate).asDate
     }
 
     override fun assign(assignFrom: FieldAbs) {
-        assert(testValid(assignFrom, FieldDate::class), { CTIErrorInvalidObject })
+        assert(assignFrom is FieldDate, { CTIErrorInvalidObject })
         if (assignFrom.isNull)
             isNull = true
         else

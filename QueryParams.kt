@@ -40,7 +40,7 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
 
     fun getParamAsString(name: String): String{
         val param =  findParamByName(name, QueryParamString::class)
-        assert(testValid(param, QueryParamAbs::class), { CTIErrorInvalidObject })
+        assert(param is QueryParamAbs, { CTIErrorInvalidObject })
         return param!!.valueAsString
     }
     fun setParamAsString(name: String, value: String){
@@ -56,7 +56,7 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
 
     fun getValueAsString(name: String): String{
         val param = findParamByName(name, QueryParamAbs::class)
-        assert(testValid(param, QueryParamAbs::class), { CTIErrorInvalidObject })
+        assert(param is QueryParamAbs, { CTIErrorInvalidObject })
         return param!!.valueAsString
     }
 
@@ -72,7 +72,7 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
 
     fun getValueAsInteger(name: String): Long{
         val param = findParamByName(name, QueryParamInteger::class)
-        assert(testValid(param, QueryParamInteger::class), { CTIErrorInvalidObject })
+        assert(param is QueryParamInteger, { CTIErrorInvalidObject })
         return param!!.valueAsInteger
     }
 
@@ -88,7 +88,7 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
 
     fun getValueAsFloat(name: String): Double{
         val param = findParamByName(name, QueryParamFloat::class)
-        assert(testValid(param, QueryParamFloat::class), { CTIErrorInvalidObject })
+        assert(param is QueryParamFloat, { CTIErrorInvalidObject })
         return param!!.valueAsFloat
     }
 
@@ -104,7 +104,7 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
 
     fun getValueAsBoolean(name: String): Boolean{
         val param = findParamByName(name, QueryParamBoolean::class)
-        assert(testValid(param, QueryParamBoolean::class), { CTIErrorInvalidObject })
+        assert(param is QueryParamBoolean, { CTIErrorInvalidObject })
         return param!!.valueAsBoolean
     }
 
@@ -120,7 +120,7 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
 
     fun getValueAsDateTime(name: String): Date{
         val param = findParamByName(name, QueryParamDateTime::class)
-        assert(testValid(param, QueryParamDateTime::class), { CTIErrorInvalidObject })
+        assert(param is QueryParamDateTime, { CTIErrorInvalidObject })
         return param!!.valueAsDateTime
     }
 
@@ -136,7 +136,7 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
 
     fun getValueAsByteArray(name: String): ByteArray{
         val param = findParamByName(name, QueryParamBlob::class)
-        assert(testValid(param, QueryParamBlob::class), { CTIErrorInvalidObject })
+        assert(param is QueryParamBlob, { CTIErrorInvalidObject })
         return param!!.valueAsByteArray
     }
 
@@ -146,7 +146,7 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
     }
 
     fun setValueFromProp(fieldMetadata: Object, propName: String, paramName: String){
-        assert(testValid(fieldMetadata, Object::class), { CTIErrorInvalidObject })
+        assert(fieldMetadata is Object, { CTIErrorInvalidObject })
         assert(propName.isNotEmpty(), { "propName is not assigned"})
         assert(paramName.isNotEmpty(), { "paramName is not assigned"})
         assert(isPublishedProp(fieldMetadata::class, propName), { "$propName is not a published property on ${fieldMetadata.className()}"})
