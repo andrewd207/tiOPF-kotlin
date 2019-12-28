@@ -1,5 +1,9 @@
 package tiOPF
 
+import tiOPF.Log.LOG
+import tiOPF.Log.LOGERROR
+import tiOPF.Log.LogSeverity
+
 abstract class QuerySQL: Query() {
     protected fun whereClause(where: QueryParams?): String{
         var result = ""
@@ -53,7 +57,14 @@ abstract class QuerySQL: Query() {
         val line = "%s: [Param %d] %s"
         val list: List<String> = paramsAsStringList()
         list.forEachIndexed{index, it ->
-                LOG(line.format(className(), index+1, it, LogSeverity.lsSQL))
+            LOG(
+                line.format(
+                    className(),
+                    index + 1,
+                    it,
+                    LogSeverity.SQL
+                )
+            )
         }
     }
 

@@ -1,12 +1,18 @@
 package tiOPF
 
+import tiOPF.Log.LOG
+import tiOPF.Log.LogSeverity
+
 class ObjectVisitorSetObjectStateToDelete: Visitor() {
     override fun acceptVisitor(visited: Visited): Boolean {
         assert(visited is Object, { CTIErrorInvalidObject})
         val lVisited = visited as Object
         val result = lVisited.objectState != Object.PerObjectState.Deleted
 
-        LOG(arrayOf(this::class.simpleName, visited::class.simpleName, result), LogSeverity.lsAcceptVisitor)
+        LOG(
+            arrayOf(this::class.simpleName, visited::class.simpleName, result),
+            LogSeverity.AcceptVisitor
+        )
         return result
     }
 

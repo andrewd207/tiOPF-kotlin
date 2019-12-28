@@ -1,10 +1,17 @@
 package tiOPF
+
+import tiOPF.Log.LOG
+import tiOPF.Log.LogSeverity
+
 // complete
 class VisObjectToSQL(private val withComments: Boolean = false): VisStringStream() {
     private val groupByList = Columns()
     override fun acceptVisitor(): Boolean {
         val result = visited is Criteria && !(visited as Object).deleted
-        LOG(arrayOf(className(), visited?.className(), result), LogSeverity.lsAcceptVisitor)
+        LOG(
+            arrayOf(className(), visited?.className(), result),
+            LogSeverity.AcceptVisitor
+        )
         return result
     }
 

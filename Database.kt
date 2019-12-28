@@ -1,5 +1,7 @@
 package tiOPF
 // complete
+import tiOPF.Log.LOG
+import tiOPF.Log.LogSeverity
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
@@ -129,7 +131,10 @@ abstract class Database: BaseObject() {
     }
 
     fun connect(databaseName: String, userName: String, password: String, params: String){
-        LOG("Attempting to connect to: %s Params: %s".format(databaseName, params), LogSeverity.lsConnectionPool);
+        LOG(
+            "Attempting to connect to: %s Params: %s".format(databaseName, params),
+            LogSeverity.ConnectionPool
+        );
         this.databaseName = databaseName
         this.userName = userName
         this.password = password
@@ -149,6 +154,9 @@ abstract class Database: BaseObject() {
 
         connected = true
 
-        LOG("Connect to $databaseName successful.", LogSeverity.lsConnectionPool)
+        LOG(
+            "Connect to $databaseName successful.",
+            LogSeverity.ConnectionPool
+        )
     }
 }

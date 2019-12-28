@@ -1,8 +1,8 @@
 package tiOPF
 
+import tiOPF.Log.LOG
+import tiOPF.Log.LogSeverity
 import kotlin.reflect.KClass
-import kotlin.reflect.full.companionObject
-import kotlin.reflect.full.companionObjectInstance
 
 // complete
 @Suppress("UNCHECKED_CAST")
@@ -59,7 +59,7 @@ open class VisitorManager(val manager: OPFManager): BaseObject() {
         } else{
             "About to process visitors for <%s> Visited: (null)".format(groupName)
         }
-        LOG(logMessage, LogSeverity.lsVisitor)
+        LOG(logMessage, LogSeverity.Visitor)
         val visitors = List<Visitor>()
         val visitorMappingGroup = findVisitorMappingGroup(groupName)
         visitorMappingGroup?: throw Exception(CErrorInvalidVisitorGroup.format(groupName)+ ". Registered count == "+visitorMappings.size)
@@ -81,7 +81,7 @@ open class VisitorManager(val manager: OPFManager): BaseObject() {
                 visited!!.caption
             )
         } else{ "Finished process visitors for <%s> Visited: (null)".format(groupName) }
-        LOG(logMessage, LogSeverity.lsVisitor)
+        LOG(logMessage, LogSeverity.Visitor)
 
     }
     fun executeVisitors(visitorController: VisitorController, visitors: List<Visitor>, visited: Visited?){

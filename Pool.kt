@@ -1,8 +1,9 @@
 package tiOPF
+
+import tiOPF.Log.LOG
+import tiOPF.Log.LogSeverity
+
 // complete
-import kotlin.reflect.KClass
-import kotlin.reflect.full.companionObject
-import kotlin.reflect.full.primaryConstructor
 
 const val CMaxPoolSize =  9999; // Maximum number of items allowed in the pool
 const val CMinPoolSize =     1; // Minimum number of items to remain in the pool
@@ -67,8 +68,14 @@ abstract class Pool(val minPoolSize: Int, val maxPoolSize: Int): BaseObject(){
             if (item == null && list.size < maxPoolSize ){
                 item = addItem()
                 item!!.locked = true
-                LOG("A new PooledItem has been added to the pool.", LogSeverity.lsConnectionPool)
-                LOG("PooledItem #${list.size} locked.", LogSeverity.lsConnectionPool)
+                LOG(
+                    "A new PooledItem has been added to the pool.",
+                    LogSeverity.ConnectionPool
+                )
+                LOG(
+                    "PooledItem #${list.size} locked.",
+                    LogSeverity.ConnectionPool
+                )
             }
 
             if (item == null) {
@@ -104,10 +111,15 @@ abstract class Pool(val minPoolSize: Int, val maxPoolSize: Int): BaseObject(){
             for (i in count-1 downTo 0) {
                 val item = list[i]
                 if (item.mustRemoveItemFromPool(count)){
-                    LOG("'Pooled item (${this::class.simpleName}) #${item.index}) being removed from the pool.",
-                        LogSeverity.lsConnectionPool)
+                    LOG(
+                        "'Pooled item (${this::class.simpleName}) #${item.index}) being removed from the pool.",
+                        LogSeverity.ConnectionPool
+                    )
                     list.removeAt(i)
-                    LOG("There are ${list.size} items left in the pool.", LogSeverity.lsConnectionPool)
+                    LOG(
+                        "There are ${list.size} items left in the pool.",
+                        LogSeverity.ConnectionPool
+                    )
                 }
             }
         }
@@ -132,7 +144,10 @@ abstract class Pool(val minPoolSize: Int, val maxPoolSize: Int): BaseObject(){
     protected abstract fun afterAddPooledItem(item: PooledItem)
     protected fun addItem(): PooledItem{
         val result = pooledItemInterface().createInstance(this)
-        LOG("Attempting to add pooled item #$count",LogSeverity.lsConnectionPool)
+        LOG(
+            "Attempting to add pooled item #$count",
+            LogSeverity.ConnectionPool
+        )
         val list = pool.lockList()
         try {
             afterAddPooledItem(result)
@@ -150,7 +165,10 @@ abstract class Pool(val minPoolSize: Int, val maxPoolSize: Int): BaseObject(){
             if (!it.locked && !it.mustRemoveItemFromPool(list.size)){
                 it.index = list.indexOf(it) // pointless?
                 it.locked = true
-                LOG("Found an available item (#${it.index}) in pool and locked it.", LogSeverity.lsConnectionPool)
+                LOG(
+                    "Found an available item (#${it.index}) in pool and locked it.",
+                    LogSeverity.ConnectionPool
+                )
                 result = it
                 return@forEach
             }

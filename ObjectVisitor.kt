@@ -1,5 +1,7 @@
 package tiOPF
 
+import tiOPF.Log.LOG
+import tiOPF.Log.LogSeverity
 import kotlin.reflect.KClass
 
 // complete
@@ -33,7 +35,11 @@ open class ObjectVisitor: Visitor() {
         if (classNames.contains(lClassName))
             return
 
-        LOG(queryName.padEnd(20)+ ' '+ queryTime.toString().padEnd(7)+ scanTime.toString().padEnd(7), LogSeverity.lsQueryTiming)
+        LOG(
+            queryName.padEnd(20) + ' ' + queryTime.toString().padEnd(7) + scanTime.toString().padEnd(
+                7
+            ), LogSeverity.QueryTiming
+        )
     }
     var persistenceLayer: PersistenceLayer? = null
     var database: Database? = null

@@ -1,6 +1,8 @@
 package tiOPF
 
 
+import tiOPF.Log.LOG
+import tiOPF.Log.LogSeverity
 import java.sql.*
 import java.time.LocalDate
 import java.util.*
@@ -354,7 +356,10 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun execSQL(): Long {
-        LOG(className() + ": [Prepare] "+ preparedSqlText, LogSeverity.lsSQL)
+        LOG(
+            className() + ": [Prepare] " + preparedSqlText,
+            LogSeverity.SQL
+        )
         checkPrepared()
 //        logParams()
         var result: Long = 0

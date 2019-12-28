@@ -1,5 +1,7 @@
 package tiOPF
 // complete
+import tiOPF.Log.LOG
+import tiOPF.Log.LogSeverity
 import java.util.concurrent.locks.ReentrantLock
 
 const val CErrorAttemptToAddDuplicateDBConnectionPool = "Attempt to register a duplicate database connection: \"%s\""
@@ -61,8 +63,10 @@ class DBConnectionPools(val persistenceLayer: PersistenceLayer): BaseObject() {
             var dbConnectionPool = find(databaseAlias)
             if (dbConnectionPool != null)
                 throw EtiOPFProgrammerException(CErrorAttemptToAddDuplicateDBConnectionPool.format(databaseName+'/'+userName))
-            LOG("Creating database connection pool for %s/%s".format(databaseName, userName),
-                LogSeverity.lsConnectionPool)
+            LOG(
+                "Creating database connection pool for %s/%s".format(databaseName, userName),
+                LogSeverity.ConnectionPool
+            )
             dbConnectionPool = DBConnectionPool(this, databaseAlias, connectParams)
             val database = dbConnectionPool.lock()
             dbConnectionPool.unlock(database)
