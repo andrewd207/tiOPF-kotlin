@@ -1,5 +1,7 @@
 package tiOPF
 
+import tiOPF.Log.LOG
+import tiOPF.Log.LogSeverity
 import java.io.File
 import java.io.File.separator
 import kotlin.reflect.KClass
@@ -95,7 +97,7 @@ class PersistenceLayers: ObjectList<PersistenceLayer>() {
     // Do not call these yourself. They are called in the initialization section
     // of QueryXXX.kt that contains the concrete classes.
     fun __registerPersistenceLayer(persistenceLayerClass: IPersistenceLayerClass){
-        println("Registered Layer per ${persistenceLayerClass.createInstance().persistenceLayerName}")
+        LOG("Registered Layer per ${persistenceLayerClass.createInstance().persistenceLayerName}", LogSeverity.SQL)
         assert(persistenceLayerClass != null, { "persistenceLayerClass not assigned"})
         val data = persistenceLayerClass.createInstance()
         if (!isLoaded(data.persistenceLayerName))

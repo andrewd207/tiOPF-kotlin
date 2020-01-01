@@ -41,9 +41,9 @@ enum class LogSeverity {
     ,SQL
 }
 
-val sevToLogMinimal = setOf<LogSeverity>(LogSeverity.UserInfo, LogSeverity.Warning, LogSeverity.Error)
-val sevToLogMedium = sevToLogMinimal + setOf<LogSeverity>(LogSeverity.Normal)
-val sevToLogVerbose = sevToLogMinimal + setOf<LogSeverity>( LogSeverity.ObjCreation,
+val sevToLogMinimal = setOf(LogSeverity.UserInfo, LogSeverity.Warning, LogSeverity.Error)
+val sevToLogMedium = sevToLogMinimal + setOf(LogSeverity.Normal)
+val sevToLogVerbose = sevToLogMedium + setOf( LogSeverity.ObjCreation,
                                                             LogSeverity.Visitor,
                                                             LogSeverity.ConnectionPool,
                                                             LogSeverity.AcceptVisitor,

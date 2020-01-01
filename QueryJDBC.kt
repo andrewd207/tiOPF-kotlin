@@ -47,13 +47,18 @@ open class QueryJDBC : QuerySQL(){
             while (cont) {
 
 
-                val isChar = (i <= text.lastIndex && (text[i] in 'a'..'z' || text[i] in 'A'..'Z' || text[i] == '_'))
+                val isChar = (i <= text.lastIndex &&
+                        (text[i] in 'a'..'z' ||
+                         text[i] in 'A'..'Z' ||
+                         text[i] == '_' ||
+                         text[i] in '0'..'9'))
+
                 if (i <= text.lastIndex && isChar)
                     i++
                 else {
                     val end = i
                     val entry = text.substring(start, end)
-                    println("entry: $entry")
+                    LOG("converting '$entry' to '?' for JDBC at index ${sqlParamMap.count()+1}", LogSeverity.SQL)
                     sqlParamMap[entry] = sqlParamMap.count()+1
                     i -= end-start+1 //+1 because of ?
                     cont = false
@@ -68,7 +73,7 @@ open class QueryJDBC : QuerySQL(){
 
         preparedSqlText = text
 
-        println("sql after: $text")
+        LOG("sql after: $text", LogSeverity.SQL)
 
 
 
@@ -335,9 +340,10 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun open() {
-        checkPrepared()
+        execSQL()
+        /*checkPrepared()
         resultSet = statement!!.executeQuery()
-        resultSet?.next()
+        resultSet?.next()*/
     }
 
     override fun assignFieldAsByteArray(index: Int, data: ValueOut<ByteArray>) {
@@ -361,7 +367,7 @@ open class QueryJDBC : QuerySQL(){
             LogSeverity.SQL
         )
         checkPrepared()
-//        logParams()
+        logParams()
         var result: Long = 0
         resultSet = null
         when (queryType) {
@@ -375,6 +381,7 @@ open class QueryJDBC : QuerySQL(){
         if (resultSet != null){
             resultSet!!.last()
             result = resultSet!!.row.toLong()
+            resultSet!!.first()
         }
 
         return result
@@ -474,9 +481,7 @@ interface IDatabaseJDBCCompanion: IDatabaseCompanion{
         props.setProperty("user", user)
         props.setProperty("password", password)
         val drv = driver
-        if (drv == null) {
-            println(drv)
-        }
+
         return drv?.connect(url, props)
     }
     fun getDriverName(): String{  // just the name i.e. "jdbc:firebirdsql:"

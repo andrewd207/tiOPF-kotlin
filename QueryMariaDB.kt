@@ -22,9 +22,6 @@ class DatabaseMariaDB: DatabaseJDBC(){
             props.setProperty("user", user)
             props.setProperty("password", password)
             val drv = driver
-            if (drv != null) {
-                println(drv)
-            }
 
             val connection = drv!!.connect(url, props)
             connection?.autoCommit = false

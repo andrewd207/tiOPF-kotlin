@@ -26,9 +26,6 @@ class DatabaseFB: DatabaseJDBC(){
             props.setProperty("lc_ctype", "utf8")
             //props.setProperty("wireCrypt", "ENABLED")
             val drv = driver
-            if (drv != null) {
-                println(drv)
-            }
 
             val connection = drv!!.connect(url, props)
             connection?.autoCommit = false
