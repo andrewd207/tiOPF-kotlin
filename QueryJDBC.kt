@@ -27,7 +27,11 @@ open class QueryJDBC : QuerySQL(){
             else
                 statement?.close()
         }
-    protected val sqlParamMap = mutableMapOf<String, Int>()
+    protected class ParamEntry(val name: String, var index: Int) {
+        var value: Any? = null
+        fun valueIsNull(): Boolean { return value == null}
+    }
+    protected val sqlParamMap = mutableMapOf<String, ParamEntry>()
     private fun assignParamMap(){
         // turn :SOME_VALUE into ? and record the index
         sqlParamMap.clear()
@@ -59,7 +63,7 @@ open class QueryJDBC : QuerySQL(){
                     val end = i
                     val entry = text.substring(start, end)
                     LOG("converting '$entry' to '?' for JDBC at index ${sqlParamMap.count()+1}", LogSeverity.SQL)
-                    sqlParamMap[entry] = sqlParamMap.count()+1
+                    sqlParamMap[entry] = ParamEntry(entry, sqlParamMap.count()+1)
                     i -= end-start+1 //+1 because of ?
                     cont = false
                 }
@@ -137,13 +141,19 @@ open class QueryJDBC : QuerySQL(){
 
     override fun setParamAsString(name: String, value: String) {
         checkPrepared()
-        statement!!.setString(sqlParamMap[name]!!, value)
+        sqlParamMap[name]!!.value = value
+        statement!!.setString(sqlParamMap[name]!!.index, value)
     }
 
     override fun getParamAsString(name: String): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        //checkPrepared()
-        //statement!!.getString(sqlParamMap[name]!!, value)
+        if (sqlParamMap[name]!!.valueIsNull()) return ""
+        val value = sqlParamMap[name]!!.value
+        return when (value) {
+            is String -> value
+            is Number -> value.toString()
+            else -> value.toString()
+        }
+
     }
 
     override fun getParamAsInteger(name: String): Long {
@@ -152,7 +162,8 @@ open class QueryJDBC : QuerySQL(){
 
     override fun setParamAsInteger(name: String, value: Long) {
         checkPrepared()
-        statement!!.setLong(sqlParamMap[name]!!, value)
+        sqlParamMap[name]!!.value = value
+        statement!!.setLong(sqlParamMap[name]!!.index, value)
     }
 
     override fun getParamAsFloat(name: String): Float {
@@ -161,7 +172,8 @@ open class QueryJDBC : QuerySQL(){
 
     override fun setParamAsFloat(name: String, value: Double) {
         checkPrepared()
-        statement!!.setFloat(sqlParamMap[name]!!, value.toFloat())
+        sqlParamMap[name]!!.value = value
+        statement!!.setFloat(sqlParamMap[name]!!.index, value.toFloat())
     }
 
     override fun getParamAsBoolean(name: String): Boolean {
@@ -170,7 +182,8 @@ open class QueryJDBC : QuerySQL(){
 
     override fun setParamAsBoolean(name: String, value: Boolean) {
         checkPrepared()
-        statement!!.setBoolean(sqlParamMap[name]!!, value)
+        sqlParamMap[name]!!.value = value
+        statement!!.setBoolean(sqlParamMap[name]!!.index, value)
     }
 
     override fun getParamAsDate(name: String): Date {
@@ -189,7 +202,8 @@ open class QueryJDBC : QuerySQL(){
 
     override fun setParamAsTextBLOB(name: String, value: String) {
         checkPrepared()
-        statement!!.setBytes(sqlParamMap[name]!!, value.toByteArray())
+        sqlParamMap[name]!!.value = value
+        statement!!.setBytes(sqlParamMap[name]!!.index, value.toByteArray())
     }
 
     override fun getParamAsMacro(name: String): ByteArray {
@@ -203,12 +217,15 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun getParamIsNull(name: String): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return sqlParamMap[name]!!.valueIsNull()
     }
 
     override fun setParamIsNull(name: String, value: Boolean) {
         checkPrepared()
-        statement!!.setNull(sqlParamMap[name]!!, 0)
+        if (value) {
+            sqlParamMap[name]!!.value = null
+            statement!!.setNull(sqlParamMap[name]!!.index, 0)
+        }
     }
 
     override fun getFieldAsString(name: String): String {
@@ -357,8 +374,11 @@ open class QueryJDBC : QuerySQL(){
     }
 
     override fun close() {
-        if (resultSet != null && !resultSet!!.isClosed)
+        if (resultSet != null) {
             resultSet!!.close()
+            resultSet = null
+        }
+
     }
 
     override fun execSQL(): Long {
@@ -378,10 +398,12 @@ open class QueryJDBC : QuerySQL(){
             QueryType.DDL    -> statement!!.execute()
 
         }
-        if (resultSet != null){
-            resultSet!!.last()
-            result = resultSet!!.row.toLong()
-            resultSet!!.first()
+        if (resultSet != null && queryType in arrayOf(QueryType.Select, QueryType.DDL)){
+            if (resultSet!!.type != ResultSet.TYPE_FORWARD_ONLY) {
+                resultSet!!.last()
+                result = resultSet!!.row.toLong()
+                resultSet!!.first()
+            }
         }
 
         return result
@@ -398,7 +420,7 @@ open class QueryJDBC : QuerySQL(){
     override fun paramName(index: Long): String {
         var result = ""
         sqlParamMap.forEach { (name, i) ->
-            if (i == index.toInt())
+            if (i.index == (index +1).toInt())
                 result = name
                 return@forEach
         }
@@ -473,6 +495,7 @@ open class QueryJDBC : QuerySQL(){
 
 interface IDatabaseJDBCCompanion: IDatabaseCompanion{
     val driver: Driver? get() {
+            LOG("Requesting driver instance from JDBC: ${getDriverName()}", LogSeverity.ConnectionPool)
             return DriverManager.getDriver(getDriverName())
             // may throw an exception but it's better to catch it somewhere else
         }
@@ -534,7 +557,15 @@ interface IDatabaseJDBCCompanion: IDatabaseCompanion{
 }
 
 abstract class DatabaseJDBC: DatabaseSQL(){
-    companion object: IDatabaseJDBCCompanion
+    companion object: IDatabaseJDBCCompanion{
+        var privDriver: Driver? = null
+        override val driver: Driver?
+            get() {
+                if (privDriver == null)
+                    privDriver = super.driver
+                return privDriver
+            }
+    }
     private var privInTransaction = false
 
     private fun getDriverName(): String {
@@ -570,17 +601,20 @@ abstract class DatabaseJDBC: DatabaseSQL(){
                 if (tokenCount > 0){
                     if (tokenCount > 2)
                         tokenCount = 2
-                    dbHost = tiToken(databaseName, ':', 0, tokenCount)
-                    dbName  = databaseName.substring(dbHost.length+2, databaseName.lastIndex+1)
+                    dbHost = "//" + tiToken(databaseName, ':', 0, tokenCount)
+                    dbName  = "/" +databaseName.substring(dbHost.length+2, databaseName.lastIndex+1)
                 }
+                else
+                    dbName = databaseName
 
                 val companion = this::class.companionObjectInstance as IDatabaseJDBCCompanion
                 try {
-                    val url = "${companion.getDriverName()}//$dbHost/$dbName"
+                    val url = "${companion.getDriverName()}$dbHost$dbName"
+                    LOG("JDBC: $url", LogSeverity.SQL)
                     connection = companion.connect(url, userName, password, props)
                 }
                 catch (e: Exception){
-                    throw EtiOPFDBExceptionUserNamePassword("jdbc\n", databaseName, userName, password, "Error attempting to connect to database.\n${e}")
+                    throw EtiOPFDBExceptionUserNamePassword("${className()}\n", databaseName, userName, password, "Error attempting to connect to database.\n${e}")
                 }
             }
         }
@@ -599,6 +633,7 @@ abstract class DatabaseJDBC: DatabaseSQL(){
 
     override fun commit() {
         connection!!.commit()
+
         privInTransaction = false
     }
 

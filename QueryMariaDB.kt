@@ -34,6 +34,10 @@ class DatabaseMariaDB: DatabaseJDBC(){
         override fun createInstance(): Database {
             return DatabaseMariaDB()
         }
+        init {
+            // make sure the driver is registered in JDBC
+            Class.forName("org.mariadb.jdbc.Driver")
+        }
 
 
     }

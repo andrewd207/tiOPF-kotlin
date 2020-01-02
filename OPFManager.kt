@@ -97,5 +97,21 @@ class OPFManager: Object() {
             lPersistanceLayer.defaultDBConnectionName = databaseName
 
     }
+    fun testThenConnectDatabase(){
+        TODO("not implemented yet")
+    }
+    fun connectDatabaseWithRetry(){
+        TODO("not implemented yet")
+    }
+
+    fun createTable(tableMetadata: DBMetadataTable, dbConnectionName: String ="", persistenceLayerName: String = ""){
+        val db = persistanceLayers.lockDatabase(dbConnectionName, persistenceLayerName)
+        try {
+            db.createTable(tableMetadata)
+        }
+        finally {
+            persistanceLayers.unlockDatabase(db, dbConnectionName, persistenceLayerName)
+        }
+    }
 
 }

@@ -5,6 +5,7 @@ import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.reflect
 
 const val CErrorSettingProperty      = "Error setting property %s.%s Message %s"
 const val CErrorGettingProperty      = "Error getting property %s.%s Message %s"
@@ -39,9 +40,9 @@ fun getPublishedPropertyNames(kKlass: KClass<*>, list: MutableList<String>, fiel
 
 fun getPropertyClass(klass: KClass<*>, propName: String): KClass<*> {
 
-    val property = klass.members.find { it.name === propName }
+    val property = klass.memberProperties.find { it.name == propName }
     if (property != null)
-        return property::class
+        return property.getter.returnType.classifier as KClass<*>
 
     return Any::class
 }

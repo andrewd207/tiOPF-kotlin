@@ -1,9 +1,10 @@
 package tiOPF
 // complete
+import java.time.Instant
 import java.util.*
 
 fun now(): Long{
-    return Calendar.getInstance().time.time
+    return Instant.now().toEpochMilli()
 }
 
 const val CSecToTimeOutLocked: Int = 999999;

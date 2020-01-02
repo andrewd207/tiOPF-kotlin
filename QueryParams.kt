@@ -22,7 +22,7 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
     protected open fun <T: QueryParamAbs>findCreateParamByName(name: String, type: KClass<T>): T{
         var result = findParamByName<T>(name)
         if (result == null) {
-            result = type::primaryConstructor.call() as T
+            result = type.primaryConstructor!!.call() as T
             result.name = name
             add(result)
         }
@@ -157,12 +157,12 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
                     setValueAsString(paramName, value!!)
                 }
                 TypeKind.INT -> {
-                    val value = getObjectProperty<Long>(fieldMetadata, propName)
-                    setValueAsInteger(paramName, value!!)
+                    val value = getObjectProperty<Number>(fieldMetadata, propName)
+                    setValueAsInteger(paramName, value!!.toLong())
                 }
                 TypeKind.FLOAT -> {
-                    val value = getObjectProperty<Double>(fieldMetadata, propName)
-                    setValueAsFloat(paramName, value!!)
+                    val value = getObjectProperty<Number>(fieldMetadata, propName)
+                    setValueAsFloat(paramName, value!!.toDouble())
                 }
                 TypeKind.DATE -> {
                     val value = getObjectProperty<Date>(fieldMetadata, propName)
@@ -176,7 +176,9 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
                     val value = getObjectProperty<ByteArray>(fieldMetadata, propName)
                     setValueAsByteArray(paramName, value!!)
                 }
-                else -> throw EtiOPFProgrammerException(CErrorInvalidTypeKind)
+                else ->
+                    if (propName != "oid")
+                        throw EtiOPFProgrammerException(CErrorInvalidTypeKind)
             }
         }
         catch (e: EtiOPFProgrammerException){

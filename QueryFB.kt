@@ -37,6 +37,10 @@ class DatabaseFB: DatabaseJDBC(){
         override fun createInstance(): Database {
             return DatabaseFB()
         }
+        init {
+            // make sure the driver is registered in JDBC
+            Class.forName("org.firebirdsql.jdbc.FBDriver");
+        }
     }
     override fun queryClass(): KClass<Query> {
         return QueryFB::class as KClass<Query>

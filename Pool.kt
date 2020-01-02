@@ -95,10 +95,15 @@ abstract class Pool(val minPoolSize: Int, val maxPoolSize: Int): BaseObject(){
             if ( it.data == pooledItemData) {
                 val item = it
                 item.locked = false
+                LOG(
+                    "PooledItem  unlocked.",
+                    LogSeverity.ConnectionPool
+                )
                 unlockPoolSemaphore()
                 return@forEach
             }
         }
+        //sweepForTimeouts()
 
     }
     protected open fun sweepForTimeouts(){

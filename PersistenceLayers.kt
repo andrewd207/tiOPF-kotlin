@@ -41,14 +41,14 @@ class PersistenceLayers: ObjectList<PersistenceLayer>() {
 
         assert(defaultPersistenceLayer is PersistenceLayer, { CTIErrorInvalidObject})
 
-        val dbConnectionName = {
+        val connectionName = (
             if (dbConnectionName.isNotEmpty())
                 dbConnectionName
             else
                 regPerLayer!!.defaultDBConnectionName
-        }
+                )
 
-        return regPerLayer!!.dbConnectionPools.lock(dbConnectionName.toString())!!
+        return regPerLayer!!.dbConnectionPools.lock(connectionName)!!
 
 
     }
