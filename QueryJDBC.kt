@@ -602,7 +602,7 @@ abstract class DatabaseJDBC: DatabaseSQL(){
                     if (tokenCount > 2)
                         tokenCount = 2
                     dbHost = "//" + tiToken(databaseName, ':', 0, tokenCount)
-                    dbName  = "/" +databaseName.substring(dbHost.length+2, databaseName.lastIndex+1)
+                    dbName  = "/" +databaseName.substring(dbHost.length, databaseName.lastIndex+1)
                 }
                 else
                     dbName = databaseName
