@@ -3,6 +3,7 @@ package tiOPF
 import tiOPF.Log.LOG
 import tiOPF.Log.LogLevel
 import tiOPF.Log.LogSeverity
+import java.io.File
 import java.sql.Connection
 import java.sql.Driver
 import java.sql.DriverManager
@@ -44,6 +45,16 @@ class DatabaseSqlite: DatabaseJDBC(){
         init {
             // make sure the driver is registered in JDBC
             Class.forName("org.sqlite.JDBC")
+        }
+
+        override fun databaseExists(databaseName: String, userName: String, password: String, params: String): Boolean {
+            val file = File(databaseName)
+            return file.exists()
+        }
+
+        override fun createDatabase(databaseName: String, userName: String, password: String, params: String) {
+            val connection = driver?.connect("${getDriverName()}$databaseName", Properties())
+            connection?.close()
         }
 
 
