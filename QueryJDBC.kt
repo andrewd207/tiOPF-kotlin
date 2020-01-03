@@ -517,8 +517,10 @@ interface IDatabaseJDBCCompanion: IDatabaseCompanion{
     }
     override fun databaseExists(databaseName: String, userName: String, password: String, params: String): Boolean {
         val props = Properties()
+        val dbParts = DatabaseNameAsParts(databaseName, getDriverName())
+        val url = dbParts.urlHostOnly()
         val connection =
-            DatabaseJDBC.connect("${this.getDriverName()}//$databaseName", userName, password, props)
+            connect(url, userName, password, props)
         var result: Boolean
         if ( connection != null) {
             connection.use { connection ->
@@ -526,7 +528,7 @@ interface IDatabaseJDBCCompanion: IDatabaseCompanion{
                 resultSet.use { resultSet ->
                     while (resultSet.next()) {
                         val dbName = resultSet.getString(1)
-                        if (databaseName.equals(dbName)) {
+                        if (dbParts.name.equals(dbName, true)) {
                             return true
                         }
                     }
@@ -537,11 +539,13 @@ interface IDatabaseJDBCCompanion: IDatabaseCompanion{
     }
     override fun createDatabase(databaseName: String, userName: String, password: String, params: String) {
         val props = Properties()
+        val dbParts = DatabaseNameAsParts(databaseName, getDriverName())
+        val url = dbParts.urlHostOnly()
         val connection =
-            DatabaseJDBC.connect("jdbc:${DatabaseJDBC.getDriverName()}://$databaseName", userName, password, props)
+            connect(url, userName, password, props)
         val statement = connection?.createStatement()
         if (statement != null){
-            val sql = "CREATE DATABASE $databaseName"
+            val sql = "CREATE DATABASE ${dbParts.name}"
             statement.execute(sql)
         }
         connection?.close()
@@ -558,6 +562,33 @@ interface IDatabaseJDBCCompanion: IDatabaseCompanion{
                     statement.executeUpdate(sql)
                 }
             }
+    }
+}
+
+class DatabaseNameAsParts(val databaseName: String, val driverName: String){
+    var host = ""
+    var name = ""
+    private var hostPrefix = ""
+    private var namePrefix = ""
+    init {
+        var tokenCount = tiNumToken(databaseName, ':')
+        if (tokenCount > 0){
+            if (tokenCount > 2)
+                tokenCount = 2
+            hostPrefix = "//"
+            namePrefix = "/"
+            host = tiToken(databaseName, ':', 0, tokenCount)
+            name  = databaseName.substring(host.length+2, databaseName.lastIndex+1)
+        }
+        else
+            name = databaseName
+    }
+    fun url(): String {
+        return "$driverName$hostPrefix$host$namePrefix$name"
+
+    }
+    fun urlHostOnly(): String {
+        return "$driverName$hostPrefix$host"
     }
 }
 
@@ -600,21 +631,12 @@ abstract class DatabaseJDBC: DatabaseSQL(){
         set(value) {
             if (value && !connected){
                 val props = Properties()
-                var dbName: String = ""
-                var dbHost = ""
-                var tokenCount = tiNumToken(databaseName, ':')
-                if (tokenCount > 0){
-                    if (tokenCount > 2)
-                        tokenCount = 2
-                    dbHost = "//" + tiToken(databaseName, ':', 0, tokenCount)
-                    dbName  = "/" +databaseName.substring(dbHost.length, databaseName.lastIndex+1)
-                }
-                else
-                    dbName = databaseName
-
                 val companion = this::class.companionObjectInstance as IDatabaseJDBCCompanion
+                val dbParts = DatabaseNameAsParts(databaseName, companion.getDriverName())
+
+
                 try {
-                    val url = "${companion.getDriverName()}$dbHost$dbName"
+                    val url = dbParts.url()
                     LOG("JDBC: $url", LogSeverity.SQL)
                     connection = companion.connect(url, userName, password, props)
                 }

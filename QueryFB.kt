@@ -1,11 +1,10 @@
 package tiOPF
 
+import org.firebirdsql.gds.impl.GDSFactory
+import org.firebirdsql.management.FBManager
 import java.sql.Connection
-import java.sql.Driver
-import java.sql.DriverManager
 import java.util.*
 import kotlin.reflect.KClass
-import kotlin.reflect.full.companionObjectInstance
 
 class QueryFB: QueryJDBC() {
     companion object: IQueryCompanion{
@@ -44,6 +43,52 @@ class DatabaseFB: DatabaseJDBC(){
         init {
             // make sure the driver is registered in JDBC
             Class.forName("org.firebirdsql.jdbc.FBDriver");
+        }
+
+        override fun databaseExists(databaseName: String, userName: String, password: String, params: String): Boolean {
+            val dbParts  = DatabaseNameAsParts(databaseName, getDriverName())
+            val props = Properties()
+            props.setProperty("user", userName)
+            props.setProperty("password", password)
+            props.setProperty("lc_ctype", "utf8")
+            //props.setProperty("wireCrypt", "ENABLED")
+            val drv = driver
+
+            try {
+                val connection = drv!!.connect(dbParts.url(), props)
+                connection.close()
+                return true
+            }
+            catch (e: Exception){
+                return false
+            }
+
+        }
+
+        override fun createDatabase(databaseName: String, userName: String, password: String, params: String) {
+            // some hints: the path of the database must be accessible from the firebird user!
+            // on my pc the folder is owned by firefird:firebird user/group and it works.
+            val dbParts  = DatabaseNameAsParts(databaseName, getDriverName())
+            val type = GDSFactory.getDefaultGDSType()
+            val manager = FBManager(type)
+            manager.password = password
+            manager.userName = userName
+            manager.fileName = dbParts.name
+            manager.start()
+            var e: Exception? = null
+            try {
+                manager.createDatabase(dbParts.name, userName, password)
+                manager.stop()
+            }
+            catch (exception: Exception){
+                e = exception
+            }
+            finally {
+                manager.close()
+            }
+            if (e != null)
+                throw e
+
         }
     }
     override fun queryClass(): KClass<Query> {

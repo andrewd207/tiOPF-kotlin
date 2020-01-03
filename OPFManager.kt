@@ -114,4 +114,21 @@ class OPFManager: Object() {
         }
     }
 
+    fun createDatabase(databaseName: String, username: String, password: String, persistenceLayerName: String = ""){
+        val layer = persistanceLayers.findByPersistanceLayerName(persistenceLayerName)
+            ?: throw EtiOPFInternalException(CErrorUnableToFindPerLayer.format(persistenceLayerName))
+        layer.databaseCompanion.createDatabase(databaseName, username, password)
+    }
+
+    fun dropDatabase(databaseName: String, username: String, password: String, persistenceLayerName: String = "") {
+        val layer = persistanceLayers.findByPersistanceLayerName(persistenceLayerName)
+            ?: throw EtiOPFInternalException(CErrorUnableToFindPerLayer.format(persistenceLayerName))
+        layer.databaseCompanion.dropDatabase(databaseName, username, password)
+    }
+
+    fun databaseExists(databaseName: String, username: String, password: String, persistenceLayerName: String = ""): Boolean {
+        val layer = persistanceLayers.findByPersistanceLayerName(persistenceLayerName)
+            ?: throw EtiOPFInternalException(CErrorUnableToFindPerLayer.format(persistenceLayerName))
+        return layer.databaseCompanion.databaseExists(databaseName, username, password)
+    }
 }
