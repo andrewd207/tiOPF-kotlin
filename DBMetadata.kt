@@ -3,7 +3,7 @@ package tiOPF
 class DBMetadata: ObjectList<DBMetadataTable>() {
     fun findByTableName(tableName: String): DBMetadataTable?{
         forEach {
-            if (it.name.equals(tableName))
+            if (it.name.equals(tableName, true))
                 return it
         }
         return null

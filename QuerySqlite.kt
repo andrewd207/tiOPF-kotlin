@@ -38,6 +38,9 @@ class DatabaseSqlite: DatabaseJDBC(){
         override fun createInstance(): Database {
             return DatabaseSqlite()
         }
+        override fun klass(): KClass<Database> {
+            return DatabaseSqlite::class as KClass<Database>
+        }
         init {
             // make sure the driver is registered in JDBC
             Class.forName("org.sqlite.JDBC")

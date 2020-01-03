@@ -32,6 +32,7 @@ open class QueryJDBC : QuerySQL(){
         fun valueIsNull(): Boolean { return value == null}
     }
     protected val sqlParamMap = mutableMapOf<String, ParamEntry>()
+    private var nextWasNull = false
     private fun assignParamMap(){
         // turn :SOME_VALUE into ? and record the index
         sqlParamMap.clear()
@@ -136,7 +137,7 @@ open class QueryJDBC : QuerySQL(){
 
     override val eof: Boolean
         get() {
-            return resultSet == null || resultSet!!.isAfterLast
+            return resultSet == null || resultSet!!.isAfterLast || nextWasNull || (resultSet!!.isBeforeFirst && resultSet!!.isAfterLast)
         }
 
     override fun setParamAsString(name: String, value: String) {
@@ -386,6 +387,7 @@ open class QueryJDBC : QuerySQL(){
             className() + ": [Prepare] " + preparedSqlText,
             LogSeverity.SQL
         )
+        nextWasNull = false
         checkPrepared()
         logParams()
         var result: Long = 0
@@ -398,19 +400,22 @@ open class QueryJDBC : QuerySQL(){
             QueryType.DDL    -> statement!!.execute()
 
         }
-        if (resultSet != null && queryType in arrayOf(QueryType.Select, QueryType.DDL)){
-            if (resultSet!!.type != ResultSet.TYPE_FORWARD_ONLY) {
+
+        if (resultSet != null) {
+            next() // will set nextWasNull or move us to the first row
+        }
+
+        if (resultSet != null && !nextWasNull && resultSet!!.type != ResultSet.TYPE_FORWARD_ONLY) {
+            // hack to get the row count, not supported on all databases
                 resultSet!!.last()
                 result = resultSet!!.row.toLong()
                 resultSet!!.first()
-            }
         }
-
         return result
     }
 
     override fun next() {
-        resultSet!!.next()
+        nextWasNull = !resultSet!!.next()
     }
 
     override fun paramCount(): Long {

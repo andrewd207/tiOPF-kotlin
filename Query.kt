@@ -174,6 +174,7 @@ abstract class Query: BaseObject() {
             sql = sql.substring(0, p)
             return when (sql){
                 "select" -> QueryType.Select
+                "show" -> QueryType.Select // only mysql/mariadb has this. 'show tables'
                 "insert" -> QueryType.Insert
                 "update" -> QueryType.Update
                 "delete" -> QueryType.Delete

@@ -37,6 +37,10 @@ class DatabaseFB: DatabaseJDBC(){
         override fun createInstance(): Database {
             return DatabaseFB()
         }
+
+        override fun klass(): KClass<Database> {
+            return DatabaseFB::class as KClass<Database>
+        }
         init {
             // make sure the driver is registered in JDBC
             Class.forName("org.firebirdsql.jdbc.FBDriver");
@@ -52,15 +56,15 @@ class DatabaseFB: DatabaseJDBC(){
         {
             query.attachDatabase(this)
             query.sqlText = """
-                SELECT RDB${'$'}RELATION_NAME as Table_Name FROM RDB${'$'}RELATION_NAME as TABLE_NAME ${'$'}RELATIONS 
+                SELECT RDB${'$'}RELATION_NAME as TABLE_NAME FROM RDB${'$'}RELATIONS 
                 WHERE ((RDB${'$'}SYSTEM_FLAG = 0) OR (RDB${'$'}SYSTEM_FLAG IS NULL)) 
-                ORDER BY RDB${'$'}\RELATION_NAME            
+                ORDER BY TABLE_NAME                            
             """.trimIndent()
 
             query.open()
             while (!query.eof) {
                 val table = DBMetadataTable()
-                table.name = query.getFieldAsString("TABLE_NAME".trim())
+                table.name = query.getFieldAsString("TABLE_NAME").trim()
                 table.objectState = Object.PerObjectState.PK
                 data.add(table)
                 query.next()
