@@ -613,15 +613,15 @@ abstract class DatabaseJDBC: DatabaseSQL(){
     }
 
     override fun readMetadataTables(data: DBMetadata) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("readMetadataTables must be implemented in subclass")
     }
 
     override fun readMetadataFields(data: DBMetadataTable) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("readMetadataFields must be implemented in subclass")
     }
 
     override fun fieldMetadataToSQLCreate(fieldMetadata: DBMetadataField):String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("fieldMetadataToSQLCreate must be implemented in subclass")
     }
 
     override var connected: Boolean
