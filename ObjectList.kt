@@ -73,9 +73,9 @@ open class ObjectList<T: BaseObject>: Object(), MutableList<T> {
     override fun get(index: Int): T{
         return items[index]
     }
-    override fun set(index: Int, value: T): T{
-        items[index] = value
-        return value
+    override fun set(index: Int, element: T): T{
+        items[index] = element
+        return element
     }
 
     override fun clear(){
