@@ -21,7 +21,7 @@ open class ObjectList<T: BaseObject>: Object(), MutableList<T> {
             (item as Object).owner = this
         val result = items.add(element)
         if (element is Object)
-            notifyObservers(this, NotifyOperation.noAddItem, item as Object, "")
+            notifyObservers(this, NotifyOperation.AddItem, item as Object, "")
 
         return result
     }

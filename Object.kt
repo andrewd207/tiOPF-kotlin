@@ -15,7 +15,9 @@ const val CErrorDefaultOIDGeneratorNotAssigned = "Default OIDGenerator not assig
 const val CError = "Error: "
 const val CErrorInvalidDate = "A DateTime was passed when a Date was expected. DateTime=\"%s\""
 
-
+interface IObserverHandlesErrorState {
+    fun processErrorState(subject: Object, operation: Object.NotifyOperation, errors: ObjectErrorList);
+}
 
 open class Object(): Visited(), IObject<Object> {
     enum class PerObjectState {
@@ -29,7 +31,7 @@ open class Object(): Visited(), IObject<Object> {
         Loading
     }
 
-    enum class NotifyOperation {noChanged, noAddItem, noDeleteItem, noFree, noCustom, noReSort}
+    enum class NotifyOperation {Changed, AddItem, DeleteItem, Free, Custom, ReSort}
 
 
     constructor(owner: Object?, databaseName: String ="", persistenceLayerName:String = ""): this(){
@@ -60,7 +62,14 @@ open class Object(): Visited(), IObject<Object> {
     }
     protected open var persistenceLayerName =""
     val updateTopicList = mutableListOf<String>()
-    var observerList: MutableList<Object>? = mutableListOf() // TODO different type?
+    private var privObserverList: MutableList<Object>? = null
+    var observerList: MutableList<Object>
+        get() {
+            if (privObserverList == null)
+                privObserverList = mutableListOf()
+            return privObserverList!!
+        }
+        set(value) { privObserverList = value}
     open var deleted: Boolean
         get() {
             return objectState == PerObjectState.Delete || objectState == PerObjectState.Deleted
@@ -110,11 +119,42 @@ open class Object(): Visited(), IObject<Object> {
         return result
     }
 
+    open fun isValid(errors: ObjectErrorList): Boolean{
+        errors.clear()
+        return true
+    }
+
+    open fun attachObserver(observer: Object){
+        if (observerList.find { it == observer } == null)
+            observerList.add(observer)
+    }
+
+    open fun detachObserver(observer: Object){
+        if (privObserverList == null)
+            return
+        observerList.remove(observer)
+
+        // try to save some memory
+        if (observerList.size == 0)
+            privObserverList == null
+    }
+
+    open fun update(subject: Object){}
+    open fun update(subject: Object, operation: NotifyOperation){
+        update(subject, operation, null)
+    }
+    open fun update(subject: Object, operation: NotifyOperation, data: Object?){
+        when (operation) {
+            NotifyOperation.Changed -> update(subject)
+            NotifyOperation.Free    -> stopObserving(subject)
+        }
+    }
+
     open fun notifyObservers(){
-        notifyObservers(this, NotifyOperation.noChanged, null, "")
+        notifyObservers(this, NotifyOperation.Changed, null, "")
     }
     open fun notifyObservers(topic: String = ""){
-        notifyObservers(this, NotifyOperation.noChanged, null, topic)
+        notifyObservers(this, NotifyOperation.Changed, null, topic)
     }
     open fun notifyObservers(subject: Object, operation: NotifyOperation){
         notifyObservers(subject, operation, null, "")
@@ -233,7 +273,7 @@ open class Object(): Visited(), IObject<Object> {
 
     }
 
-    open fun stopObserving(){
+    open fun stopObserving(subject: Object){
         // do nothing. child classes will implement
     }
 
