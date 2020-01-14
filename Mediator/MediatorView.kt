@@ -10,12 +10,12 @@ open class MediatorViewCompanion {
     open val compositeMediator = false
 }
 
-open class MediatorView constructor() : IObserverHandlesErrorState, Closeable, Object() {
+open class MediatorView<T> constructor() : IObserverHandlesErrorState, Closeable, Object() {
     companion object: MediatorViewCompanion()
     @Published open var fieldName = ""
     @Published var rootFieldName = ""
     @Published var guiFieldName = ""
-    @Published var objectUpdateMoment = ObjectUpdateMoment.Default
+    @Published open var objectUpdateMoment = ObjectUpdateMoment.Default
     @Published var onBeforeGUIToObject: BeforeGuiToObjectEvent? = null
     @Published var onAfterGUIToObject: AfterGuiToObjectEvent? = null
     @Published var onObjectToGUI: ObjectToGuiEvent? = null
@@ -45,7 +45,7 @@ open class MediatorView constructor() : IObserverHandlesErrorState, Closeable, O
 
     }
 
-    constructor(view: Any, subject: Object, fieldName: String, guiFieldName: String): this(){
+    constructor(view: T, subject: Object, fieldName: String, guiFieldName: String): this(){
         settingUp = true
         this.view = view
         this.subject = subject
@@ -70,7 +70,7 @@ open class MediatorView constructor() : IObserverHandlesErrorState, Closeable, O
             field?.attachObserver(this)
         }
 
-    open var view: Any? = null ; set(value) {
+    open var view: T? = null ; set(value) {
         objectUpdateMoment = ObjectUpdateMoment.None
         field = value
         checkSetupGUIandObject()
@@ -171,7 +171,7 @@ open class MediatorView constructor() : IObserverHandlesErrorState, Closeable, O
             setupGUIandObject()
     }
     protected open fun setupGUIandObject(){}
-    protected open fun doOnChange(){
+    protected open fun doOnChange(sender: Any){
         guiChanged()
     }
     protected open fun updateGUIValidStatus(errors: ObjectErrorList){}
@@ -185,7 +185,7 @@ open class MediatorView constructor() : IObserverHandlesErrorState, Closeable, O
     }
     protected open fun doObjectToGUI(){
         val valueRef = ValueReference(getObjectProperty<Any>(subject!!, fieldName))
-        setObjectProperty(view!!, guiFieldName, valueRef)
+        setObjectProperty(view!! as Any, guiFieldName, valueRef)
     }
     protected open fun getObjectPropValue(value: ValueReference<Any>){}
     protected fun throwMediatorError(message: String){

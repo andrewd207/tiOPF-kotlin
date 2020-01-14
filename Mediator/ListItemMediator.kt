@@ -14,11 +14,11 @@ open class ListItemMediator: Object() {
         else
             model?.detachObserver(this)
     }
-    var listMediator: CustomListMediatorView? = null
+    var listMediator: CustomListMediatorView<*>? = null
     var onBeforeSetupField: OnBeforeSetupField? = null
-    val displayNames: String get() = fieldsInfo!!.asString
-    internal var fieldsInfoPrivate: MediatorFieldInfo? = null
-    var fieldsInfo: MediatorFieldInfo? = fieldsInfoPrivate;  get() = fieldsInfoPrivate
+    val displayNames: String get() = fieldsInfo!!.asString()
+    internal var fieldsInfoPrivate: MediatorFieldInfoList? = null
+    var fieldsInfo: MediatorFieldInfoList? = fieldsInfoPrivate;  get() = fieldsInfoPrivate
     open fun close(){
         active = false
         model = null

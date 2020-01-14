@@ -5,6 +5,7 @@ import org.w3c.dom.Element
 import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
 import tiOPF.Log.LOG
+import tiOPF.publishedMemberProperties
 import java.io.*
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
@@ -180,9 +181,9 @@ class MapperXML(private val project: Project) {
     private fun objectToDOM(doc: Document, parent: Element, o: Any?){
         if (o == null)
             return
-        val props = o::class.memberProperties
+        val props = o::class.publishedMemberProperties
         props.forEach {
-            if (it.visibility == KVisibility.PUBLIC) {
+            if (it.visibility == KVisibility.PUBLIC && it.name != "caption")  {
                 val value = it.getter.call(o)
                 if (value != null) {
                     val nodeName = nameToHyphen(it.name)

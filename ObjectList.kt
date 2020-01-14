@@ -10,10 +10,14 @@ open class ObjectList<T: BaseObject>: Object(), MutableList<T> {
     override fun contains(element: T): Boolean { return items.contains(element)  }
     override fun containsAll(elements: Collection<T>): Boolean { return items.containsAll(elements) }
     override fun isEmpty(): Boolean { return items.isEmpty() }
-    override fun addAll(elements: Collection<T>): Boolean { return items.addAll(elements) }
+    override fun addAll(elements: Collection<T>): Boolean { elements.forEach { add(it) } ; return true }
     override fun iterator(): MutableIterator<T> { return items.iterator() }
-    override fun remove(element: T): Boolean { return items.remove(element) }
-    override fun removeAll(elements: Collection<T>): Boolean { return items.removeAll(elements) }
+    override fun remove(element: T): Boolean {
+        if (element is Object)
+            notifyObservers(this, NotifyOperation.DeleteItem, element as Object, "")
+        return items.remove(element)
+    }
+    override fun removeAll(elements: Collection<T>): Boolean { elements.forEach { remove(it) } ; return true }
     override fun retainAll(elements: Collection<T>): Boolean { return items.retainAll(elements) }
     override fun add(element: T): Boolean{
         val item = element as BaseObject
@@ -40,6 +44,8 @@ open class ObjectList<T: BaseObject>: Object(), MutableList<T> {
     override fun listIterator(index: Int): MutableListIterator<T> {
         return items.listIterator(index)    }
     override fun removeAt(index: Int): T {
+        if (items[index] is Object)
+            notifyObservers(this, NotifyOperation.AddItem, items[index] as Object, "")
         return items.removeAt(index)
     }
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {

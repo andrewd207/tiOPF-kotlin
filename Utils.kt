@@ -41,7 +41,7 @@ fun tiAddEllipsis(string: String, width: Int = 20): String{
 
 fun tiNumToken(value: String, token: Char):Int{
     val foundChars = value.filter { it == token }
-    return foundChars.length
+    return foundChars.length + 1
 
 }
 
@@ -49,28 +49,16 @@ fun tiGetTickCount(): ULong {
     return (now() * 24 * 60 * 60 * 1000).toULong()
 }
 
-fun tiToken(value: String, token: Char, pos: Int = 0, tokenCount: Int = 1): String{
-    var i: Int = 0
-    var found: Int = -1
-    var foundCount = 0;
-    value.forEach{
-        if (i >= pos && it == token){
-            foundCount++
-            found = i-1
-            if (foundCount == tokenCount)
-                return value.substring(pos, i)
+fun tiToken(value: String, token: Char, pos: Int = 1, tokenCount: Int = 1): String{
+    var result = value
+    val tokens = value.split(token)
 
-        }
-        i++
-    }
-    if (found > -1)
-        return value.substring(pos, found)
+    if (pos <= tokens.count())
+        return tokens[pos-1]
+    else
+        return ""
 
-    if (pos == 0)
-        return value
-
-    return value.substring(pos, value.lastIndex)
-
+    return result
 }
 
 fun getParamName(paramNo: Int, addColon: Boolean): String{

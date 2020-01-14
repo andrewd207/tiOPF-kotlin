@@ -2,6 +2,7 @@ package tiOPF
 
 import java.util.*
 import kotlin.reflect.KClass
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.superclasses
 
 val CTypeKindSimple = setOf(TypeKind.STRING, TypeKind.INT, TypeKind.FLOAT)
@@ -21,7 +22,25 @@ enum class TypeKind {
     BYTE_ARRAY,
     OBJECT,
     ENUM,
-    UNKNOWN
+    LIST,
+    UNKNOWN;
+    fun toSimpleTypeKind(): SimpleTypeKind{
+        return when (this) {
+            STRING, CHAR, LIST-> SimpleTypeKind.String
+            INT, SHORT, BYTE, LONG -> SimpleTypeKind.Int
+            DATE -> SimpleTypeKind.DateTime
+            BOOLEAN -> SimpleTypeKind.Boolean
+            FLOAT, DOUBLE -> SimpleTypeKind.Float
+            BYTE_ARRAY -> SimpleTypeKind.Binary
+            OBJECT -> SimpleTypeKind.Object
+            else -> throw EtiOPFInternalException("Unhandled TypeKind to SimpleTypeKind %s".format(this))
+        }
+
+    }
+}
+
+enum class SimpleTypeKind{
+    Int, Float, String, DateTime, Boolean, Object, Binary;
 
 }
 
@@ -50,6 +69,8 @@ fun classToTypeKind(kClass: KClass<*>): TypeKind{
                 TypeKind.ENUM
             else if (kClass.superclasses.contains(BaseObject::class))
                 TypeKind.OBJECT
+            else if (kClass.isSubclassOf(Collection::class))
+               TypeKind.LIST
             else
                 TypeKind.UNKNOWN
         }

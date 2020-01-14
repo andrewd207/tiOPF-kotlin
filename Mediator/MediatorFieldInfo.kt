@@ -51,7 +51,8 @@ open class MediatorFieldInfo(owner: MediatorFieldInfoList): NotifiedItem(owner) 
         val p1 = value.indexOf('(')
         val p2 = value.indexOf(CMediatorFieldSeparator)
 
-        origStyle = ( p1 != 0 && (p2 == 0 || p2 > p1))
+
+        origStyle = ( p1 != 0 && (p2 == -1 || p2 > p1))
         if (origStyle){
             propName = value.tiFieldName()
             caption = value.tiFieldCaption()
@@ -212,7 +213,7 @@ class MediatorFieldInfoList(itemConstructor: NotifiedItemConstructor): NotifiedA
         mediator?.callFieldInfoChanged(item, action)
     }
 
-    internal var mediator: CustomListMediatorView? = null
+    internal var mediator: CustomListMediatorView<*>? = null
 
 
 }

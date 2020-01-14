@@ -28,9 +28,9 @@ internal const val CFieldDelimiter = ';'
 
 class EtiMediator(override val message: String): Exception(message)
 
-typealias ObjectToGuiEvent = (sender: MediatorView, source: Object, dest: Any, handled: ValueReference<Boolean>) -> Unit
-typealias BeforeGuiToObjectEvent = (sender: MediatorView, source: Any, dest: Object, handled: ValueReference<Boolean>) -> Unit
-typealias AfterGuiToObjectEvent = (sender: MediatorView, source: Any, dest: Object) -> Unit
+typealias ObjectToGuiEvent = (sender: MediatorView<*>, source: Object, dest: Any, handled: ValueReference<Boolean>) -> Unit
+typealias BeforeGuiToObjectEvent = (sender: MediatorView<*>, source: Any, dest: Object, handled: ValueReference<Boolean>) -> Unit
+typealias AfterGuiToObjectEvent = (sender: MediatorView<*>, source: Any, dest: Object) -> Unit
 
 typealias OnBeforeSetupField = (obj: Object, filedName: String, value: ValueReference<String>) -> Unit
 
@@ -40,7 +40,7 @@ internal fun mediatorError(sender: Any?, msg: String){
     var sn = ""
     when (sender) {
         null -> err = msg
-        is MediatorView -> {
+        is MediatorView<*> -> {
             val m = sender
             val v = m.view
             val s = m.subject
@@ -82,7 +82,7 @@ internal fun String.tiFieldWidth(): Int{
     if (s.isBlank())
         return DefFieldWidth
     else
-        return  s.substringBefore(',').toInt()
+        return  s.substringBefore(',').trim().toInt()
 }
 internal fun String.tiFieldAlignment(): MediatorFieldInfo.Alignment{
     var s = tiSubString('(', ')').trim()

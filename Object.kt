@@ -1,5 +1,6 @@
 package tiOPF
 
+import java.util.*
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.primaryConstructor
@@ -123,9 +124,62 @@ open class Object(): Visited(), IObject<Object> {
         errors.clear()
         return true
     }
+    protected open fun doGetFieldBounds(fieldName: String, minValue: ValueReferenceInt, maxValue: ValueReferenceInt, hasBounds: ValueReference<Boolean>){
+        val f: FieldAbs?
+        val tk = getPropertyType(this, fieldName).toSimpleTypeKind()
+        f = (if (tk == SimpleTypeKind.Binary) getPropValue<FieldAbs>(fieldName) else null)
+        if (f != null) {
+            when (f){
+                is FieldString -> {
+                    minValue.value = f.nullValidation.ordinal
+                    maxValue.value = f.maxLength
+                    hasBounds.value = (minValue.value > 0 || maxValue.value > 0)
+                }
+                is FieldInteger -> {
+                    hasBounds.value = f.maxDigits > 0
+                    if (hasBounds.value) {
+                        maxValue.value = 10
+                        for (i in 2..f.maxDigits)
+                            maxValue.value = maxValue.value * 10
+                        maxValue.value = maxValue.value - 2
+                        minValue.value = -maxValue.value
+                    }
+                }
+            }
+        }
+    }
+    protected open fun doGetFieldBounds(fieldName: String, minValue: ValueReferenceDouble, maxValue: ValueReferenceDouble, hasBounds: ValueReference<Boolean>){
+        hasBounds.value = false
+    }
+    protected open fun doGetFieldBounds(fieldName: String, minValue: ValueReferenceDate, maxValue: ValueReferenceDate, hasBounds: ValueReference<Boolean>){
+        hasBounds.value = false
+    }
+
+    fun getFieldBounds(fieldName: String, minValue: ValueReferenceInt, maxValue: ValueReferenceInt): Boolean{
+        val result = ValueReference(false)
+        try {
+            doGetFieldBounds(fieldName, minValue, maxValue, result)
+        }
+        catch (e: Exception){
+            return false
+        }
+
+        return result.value
+    }
+    fun getFieldBounds(fieldName: String, minValue: ValueReferenceDouble, maxValue: ValueReferenceDouble): Boolean{
+        val result = ValueReference(false)
+        doGetFieldBounds(fieldName, minValue, maxValue, result)
+        return result.value
+
+    }
+    fun getFieldBounds(fieldName: String, minValue: ValueReferenceDate, maxValue: ValueReferenceDate): Boolean{
+        val result = ValueReference(false)
+        doGetFieldBounds(fieldName, minValue, maxValue, result)
+        return result.value
+    }
 
     open fun attachObserver(observer: Object){
-        if (observerList.find { it == observer } == null)
+        if (privObserverList == null || observerList.find { it == observer } == null)
             observerList.add(observer)
     }
 
@@ -163,8 +217,43 @@ open class Object(): Visited(), IObject<Object> {
         notifyObservers(subject, operation, null, topic)
     }
     open fun notifyObservers(subject: Object, operation: NotifyOperation, data: Object?, topic: String){
-        if (observerList != null)
+        if (privObserverList == null)
             return
+        var errors: ObjectErrorList? = null
+
+        if (topic.isNotEmpty())
+            updateTopicList.add(topic)
+
+        val lObserverList = mutableListOf<Object>()
+        lObserverList.addAll(privObserverList!!)
+
+        var needsErrorList = false
+
+        if (operation != NotifyOperation.Free) {
+            lObserverList.forEach {
+
+                if (it != null && it is IObserverHandlesErrorState) {
+                    needsErrorList = true
+                    errors = ObjectErrorList()
+                    subject.isValid(errors!!)
+                    return@forEach
+                }
+            }
+        }
+
+        lObserverList.forEachIndexed { index, it ->
+            if (this.privObserverList == null)
+                return@forEachIndexed
+
+
+            if (index == 0 || privObserverList!!.indexOf(it) != -1){
+                it.update(subject, operation, data)
+                if (needsErrorList){
+                    if (it is IObserverHandlesErrorState)
+                        it.processErrorState(subject, operation, errors!!)
+                }
+            }
+        }
     }
 
 
@@ -269,7 +358,9 @@ open class Object(): Visited(), IObject<Object> {
     open fun <T>getPropValue(propName: String): T?{
         if (propName.equals("oid", true))
             return oid.asString as T
-        return getObjectProperty<Any>(this, propName) as T?
+        val result = getObjectProperty<Any>(this, propName)
+
+        return  (if (result != null) result as T else null)
 
     }
 

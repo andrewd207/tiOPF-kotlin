@@ -5,11 +5,11 @@ import tiOPF.*
 open class CustomListMediatorViewCompanion: MediatorViewCompanion(){
     override val compositeMediator: Boolean = true
 }
-abstract class CustomListMediatorView: MediatorView() {
+abstract class CustomListMediatorView<T>: MediatorView<T>() {
     companion object: CustomListMediatorViewCompanion()
     @Published var onBeforeSetupField: OnBeforeSetupField? = null
     @Published val model: ObjectList<Object>? get() {return (if (subject is ObjectList<*>) subject as ObjectList<Object> else null)}
-    @Published var displayNames: String get() = fieldsInfo.asString(); set(value)  {fieldName = value}
+    @Published var displayNames: String get() = fieldsInfo!!.asString(); set(value)  {fieldName = value}
     @Published var showDeleted: Boolean = false ; set(value) {
         if (value == field)
             return
@@ -22,11 +22,11 @@ abstract class CustomListMediatorView: MediatorView() {
             endUpdate()
         }
     }
-    @Published var fieldsInfo: MediatorFieldInfoList = null as MediatorFieldInfoList; get() {
+    @Published var fieldsInfo: MediatorFieldInfoList? = null ; get() {
         if (field == null)
             field = MediatorFieldInfoList(getMediatorFieldInfoConstructor())
         return field
-    } set(value) { field.assign(value)}
+    } set(value) { field?.assign(value!!)}
     override fun close() {
         active = false
         super.close()
@@ -35,8 +35,10 @@ abstract class CustomListMediatorView: MediatorView() {
     override fun update(subject: Object, operation: NotifyOperation, data: Object?) {
         when (operation){
             NotifyOperation.AddItem -> {
+                //println("adding Item")
                 val m = doCreateItemMediator(data, model!!.count()-1)
                 m.listMediator = this
+                mediatorList.add(m)
             }
             NotifyOperation.DeleteItem -> itemDeleted(data!!)
             NotifyOperation.Free -> if (subject == this.subject) this.subject = null
@@ -62,14 +64,16 @@ abstract class CustomListMediatorView: MediatorView() {
     protected abstract fun clearList()
     protected abstract fun doCreateItemMediator(data: Object?, rowIndex: Int): ListItemMediator
     protected open fun doDeleteItemMediator(index: Int, mediator: ListItemMediator){
+        mediator.active = false
+        mediator.model = null
         mediatorList.removeAt(index)
     }
     protected fun parseDisplayNames(value: String){
-        fieldsInfo.clear()
+        fieldsInfo?.clear()
         for (i in 1 .. tiNumToken(value, CFieldDelimiter)) {
             val field = tiToken(value, CFieldDelimiter, i)
-            val info = fieldsInfo.addItem()
-            info.asString = field
+            val info = fieldsInfo?.addItem()
+            info?.asString = field
         }
 
     }
@@ -84,18 +88,21 @@ abstract class CustomListMediatorView: MediatorView() {
                 else {
                     val itemMediator = doCreateItemMediator(it, index)
                     itemMediator.listMediator = this
+                    mediatorList.add(itemMediator)
 
                 }
             }
         }
-        val remove = mediatorList.subList(index+1, mediatorList.lastIndex)
-        mediatorList.removeAll(remove)
+        if (index+1 < mediatorList.lastIndex) {
+            val remove = mediatorList.subList(index + 1, mediatorList.lastIndex)
+            mediatorList.removeAll(remove)
+        }
     }
     protected abstract fun rebuildList()
     protected fun dataAndPropertyValid(data: Object): Boolean{
-        if (subject == null || fieldsInfo.isEmpty())
+        if (subject == null || fieldsInfo!!.isEmpty())
             return false
-        fieldsInfo.forEach {
+        fieldsInfo!!.forEach {
             if (!isPublishedProp(it::class, it.propName))
                 throwMediatorError(SErrInvalidPropertyName.format(it.propName, data.className()))
         }
@@ -131,6 +138,8 @@ abstract class CustomListMediatorView: MediatorView() {
         }
     }
     protected fun findObjectMediator(obj: Object, index: ValueOut<Int>): ListItemMediator?{
+
+
         index.value = mediatorList.count()-1
         while (index.value!! >= 0 && (mediatorList[index.value!!] as ListItemMediator).model != obj)
             index.value = index.value!!-1
@@ -142,10 +151,5 @@ abstract class CustomListMediatorView: MediatorView() {
         return ::MediatorFieldInfo as NotifiedItemConstructor
     }
     protected val mediatorList = ObjectList<Object>()
-
-
-
-
-
 
 }

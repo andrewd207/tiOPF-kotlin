@@ -2,106 +2,111 @@ package tiOPF.Mapper
 
 import tiOPF.ObjectList
 import tiOPF.Object
+import tiOPF.Published
 
 class Project: Object() {
     enum class EnumType{
         Int,
         String
     }
+    class Include: Object(){
+        @Published var fileName = ""
+    }
     class Unit : Object(){
         class Reference: Object(){
-            var name= ""
+            @Published var name= "" ; set(value) {beginUpdate(); field = value; endUpdate()}
         }
         class Enum :Object(){
             class EnumItem: Object(){
-                var name = ""
-                var value: Any? = null // string or int value
+                @Published var name = ""; set(value) {beginUpdate(); field = value; endUpdate()}
+                @Published var value: Any? = null // string or int value
             }
-            var name = ""
-            var set: String? = null
+            @Published var name = ""; set(value) {beginUpdate(); field = value; endUpdate()}
+            @Published var set: String? = null
             @ItemClass(EnumItem::class)
-            @Item("item") val values = ObjectList<EnumItem>()
+            @Published @Item("item") val values = ObjectList<EnumItem>()
         }
         class ClassItem :Object(){
             class Prop: Object(){
-                var name = ""
-                var type = ""
-                var virtual: Boolean? = null
+                @Published var name = ""; set(value) {beginUpdate(); field = value; endUpdate()}
+                @Published var type = ""
+                @Published var virtual: Boolean? = null
             }
             class Validator :Object(){
-                var prop = ""
-                var type = ""
-                var value: String? = null
+                @Published var prop = ""; set(value) {beginUpdate(); field = value; endUpdate()}
+                @Published var type = ""
+                @Published var value: String? = null
             }
 
             class Mapping:Object(){
                 class PropMap:Object(){
-                    var prop = ""
-                    var field = ""
-                    var type = ""
+                    @Published var prop = ""; set(value) {beginUpdate(); field = value; endUpdate()}
+                    @Published var field = ""
+                    @Published var type = ""
                 }
-                var table = ""
-                var pk = "OID"
-                var pkField = "OID"
-                var oidType = "string"
+                @Published var table = ""
+                @Published var pk = "OID"
+                @Published var pkField = "OID"
+                @Published var oidType = "string"
                 @ItemClass(PropMap::class)
-                @NoParent@Item("prop-map") val mappings = ObjectList<PropMap>()
+                @Published @NoParent@Item("prop-map") val mappings = ObjectList<PropMap>()
 
             }
             abstract class Selection:Object(){
                 enum class SelectionType{
                     Func
                 }
-                abstract val type: SelectionType
+                @Published var name = ""; set(value) {beginUpdate(); field = value; endUpdate()}
+                @Published abstract val type: SelectionType
             }
             class SelectionFunction: Selection() {
                 class Param: Object(){
-                    var name = ""
-                    var type = ""
-                    var typeName = ""
-                    var passBy = ""
-                    var sqlParam = ""
+                    @Published var name = ""; set(value) {beginUpdate(); field = value; endUpdate()}
+                    @Published var type = ""
+                    @Published var typeName = ""
+                    @Published var passBy = ""
+                    @Published var sqlParam = ""
                 }
-                override val type = SelectionType.Func
-                var name = ""
+                @Published override val type = SelectionType.Func
+
                 @ItemClass(Param::class)
-                val params = ObjectList<Param>()
-                @CDATA var sql: String? = null
+                @Published val params = ObjectList<Param>()
+                @Published @CDATA var sql: String? = null
             }
-            var baseClass = ""
-            var baseClassParent = "Object"
-            var autoMap = false
-            var autoCreateList = true
-            var oidType = ""
-            var notifyObservers = true
+            @Published var baseClass = ""; set(value) {beginUpdate(); field = value; endUpdate()}
+            @Published var baseClassParent = "Object"
+            @Published var autoMap = false
+            @Published var autoCreateList = true
+            @Published var oidType = "String"
+            @Published var notifyObservers = true
             @ItemClass(Prop::class)
-            @Item("prop")var classProps = ObjectList<Prop>()
-            var validators = ObjectList<Validator>()
+            @Published @Item("prop")var classProps = ObjectList<Prop>()
+            @Published var validators = ObjectList<Validator>()
             @Comment("Mapping into the tiOPF framework")
-            val mapping = Mapping()
+            @Published val mapping = Mapping()
             @ItemClass(Selection::class)
-            @Item("select")val selections = ObjectList<Selection>()
+            @Published @Item("select")val selections = ObjectList<Selection>()
         }
-        var name = ""
+        @Published var name = "" ; set(value) { beginUpdate(); field = value; endUpdate()}
         @ItemClass(Reference::class)
-        @Item("reference") var references =  ObjectList<Reference>()
+        @Published @Item("reference") var references =  ObjectList<Reference>()
         @Comment("Enumerations defined here")
         @ItemClass(Enum::class)
-        @Item("enum") var enums =  ObjectList<Enum>()
+        @Published @Item("enum") var enums =  ObjectList<Enum>()
         @Comment("Classes defined here")
         @ItemClass(ClassItem::class)
-        @Item("class") var classes = ObjectList<ClassItem>()
+        @Published @Item("class") var classes = ObjectList<ClassItem>()
     }
-    var tabSpaces = 2
-    var beginEndTabs = 1
-    var projectName = ""
-    var enumType = EnumType.Int
-    var visibilityTabs = 0
-    var outputdir = "../bom/"
+    @Published var tabSpaces = 2
+    @Published var beginEndTabs = 1
+    @Published var projectName = ""; set(value) {beginUpdate(); field = value; endUpdate()}
+    @Published var enumType = EnumType.Int
+    @Published var visibilityTabs = 0
+    @Published var outputdir = "../bom/"
     @Comment("Includes are added to this schema before build-time.")
-    @ItemClass(String::class)
-    var includes = mutableListOf<String>()
+    @ItemClass(Include::class)
+    @Published var includes = ObjectList<Include>()
     @Comment("Units are files that will be created along with defined types, classes, etc.")
     @ItemClass(Unit::class)
-    @Item("unit")var projectUnits = ObjectList<Unit>()
+    @Published@Item("unit")var projectUnits = ObjectList<Unit>()
 }
