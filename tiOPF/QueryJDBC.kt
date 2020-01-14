@@ -572,12 +572,12 @@ class DatabaseNameAsParts(val databaseName: String, val driverName: String){
     private var namePrefix = ""
     init {
         var tokenCount = tiNumToken(databaseName, ':')
-        if (tokenCount > 0){
-            if (tokenCount > 2)
-                tokenCount = 2
+        if (tokenCount > 1){
+            if (tokenCount > 3)
+                tokenCount = 3
             hostPrefix = "//"
             namePrefix = "/"
-            host = tiToken(databaseName, ':', 0, tokenCount)
+            host = tiToken(databaseName, ':', 1, tokenCount)
             name  = databaseName.substring(host.length+2, databaseName.lastIndex+1)
         }
         else

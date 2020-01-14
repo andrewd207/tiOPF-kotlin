@@ -50,6 +50,8 @@ fun tiGetTickCount(): ULong {
 }
 
 fun tiToken(value: String, token: Char, pos: Int = 1, tokenCount: Int = 1): String{
+    if (pos < 1)
+        throw Exception("tiToken is not zero based")
     var result = value
     val tokens = value.split(token)
 
