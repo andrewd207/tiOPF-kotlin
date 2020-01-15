@@ -56,7 +56,6 @@ val pass = ""
 val table = "test"
 
 GTIOPFManager().defaultPerLayerName = CPersistJDBCSqlite
-GTIOPFManager().defaultPerLayerName = perLayer
 GTIOPFManager().connectDatabase(db, user, pass)
 checkCreateTable() // you must implement this
 
@@ -129,7 +128,7 @@ Now changing the value in the GUI will automatically update the object. You can 
 ### TableViews
 TableViews have column several columns which complicates the fieldName somewhat.
 
-Imagine you have a list of Foo a mediator and a TableView.
+Imagine you have a list of Foo, a mediator, and a TableView.
 ~~~
 val list = ObjectList<Foo>
 @FXML lateinit var peopleTable: CustomFXTableView // typealias for TableView<MediatedItem>
