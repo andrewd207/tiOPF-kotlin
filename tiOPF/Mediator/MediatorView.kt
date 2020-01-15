@@ -55,6 +55,15 @@ open class MediatorView<T> constructor() : IObserverHandlesErrorState, Closeable
         settingUp = false
     }
 
+    fun setup(view: T, subject: tiOPF.Object?, propName: String, active: Boolean = true, updateMoment: ObjectUpdateMoment = ObjectUpdateMoment.OnExit){
+        this.active = false
+        this.view = view
+        this.fieldName = propName
+        this.subject = subject
+        this.objectUpdateMoment = updateMoment
+        this.active = active
+    }
+
     override fun close() {
         //view?.removeFreeNotification(viewHelper)
         valueList?.detachObserver(this)
