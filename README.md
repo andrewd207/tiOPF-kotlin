@@ -1,8 +1,13 @@
 This is a work in progress and is not well tested. Beware :)
 
 # What is it?
-With tiOPF you can create objects which can be persisted to a database easily or have them auto-magically mapped to widgets for easy editing. It's similar to @Serializable.
-**It requires Kotlin.reflection.full** so currently only works on the JVM target.
+The [original tiOPF](https://github.com/graemeg/tiopf/tree/tiopf2) is an excellent object persistence framework written 
+by others for Freepascal and Delphi. Also implemented is some of the [Mapper](https://github.com/graemeg/tiopf_apps) 
+code to create the mediators. This is a port of that code.
+
+With tiOPF you can create objects which can be persisted to a database easily or have them auto-magically mapped to 
+widgets for easy editing. It's similar to @Serializable. **It requires Kotlin.reflection.full** so currently only works 
+on the JVM target.
 
 Use the @Published annotation on the properties you want to make available to tiOPF. For example:
 
@@ -26,7 +31,7 @@ Save an object to a persistence layer that has been setup.
 ~~~
 foo.save() // this saves it to the database, with a little more work!
 ~~~
-//It's also possible to have an ObjectList<Foo>
+It's also possible to have an ObjectList<Foo>
 
 ~~~
 val list = ObjectList<Foo>()
@@ -40,7 +45,8 @@ list.read() will read all the items in your table into the list
 
 # Setting up the persistence layer
 
-If you are not persisting your objects this part is not needed. The original tiOPF could persist to several databases and even XML or ini. So anything is possible.
+If you are not persisting your objects this part is not needed. The original tiOPF could persist to several databases 
+and even XML or ini. So anything is possible.
 ~~~~
 // setup code that must be performed at program start
 val perLayer = CPersistJDBCSqlite
@@ -95,7 +101,8 @@ fun checkTableExists(){
 
 # Using Mediators
 
-So far, some mediators for the JavaFX widgets are implemented. Text Widgets, ComboBoxes, Lists, Trees, etc. See the javaFXMediators folder.
+So far, some mediators for JavaFX widgets are implemented. Text Widgets, ComboBoxes, Lists, Trees, etc. See the 
+javaFXMediators folder.
 
 You can create code by hand but for brevity I'm using FXML and a Controller class.
 Lookup some examples for Controller classes and FXML to learn how to use those together.
@@ -114,7 +121,8 @@ class FooController{
     }    
 }
 ~~~
-Now changing the value in the GUI will automatically update the object. You can save it to a persistence layer with *foo.save()*.
+Now changing the value in the GUI will automatically update the object. You can save it to a persistence layer with 
+*foo.save()*.
 
 ## More complicated mediators
 
@@ -130,12 +138,16 @@ val mediator
 
 The *fieldName* of the mediator is actually a composite name. in the following format:
 ~~~
-$fieldName($columnWidth, "$columnTitle"[, $alignment])[;]
+$fieldName[($columnWidth[, "$columnTitle"[, '$alignment']])][;]
 ~~~
 Each column is separated by ';' so Foo would look like this:
 ~~~
 val fieldNames = "name(-1, \"Name\"); age(-1, \"Age\")"
 mediator.setup(peopleTable, list, fieldNames)
+
+// or quick and dirty
+val fieldNames = "name;age"
+// the column titles will be set to the field names
 ~~~
 
 ### TreeView
@@ -147,7 +159,8 @@ But, it's also not impossible to accomplish.
 
 Some generic code to add a mediated TreeItem that will need to be adapted for your specific needs.
 ~~~
-private fun addChildNodeMediator(parent: TreeItem<MediatedItem>?, itemPropName: String, thisNodeName: String, subject: Object, obj: SomeObject? = null, activateMediator: Boolean = true): TreeItem<MediatedItem>{
+private fun addChildNodeMediator(parent: TreeItem<MediatedItem>?, itemPropName: String, thisNodeName: String, 
+                subject: Object, obj: SomeObject? = null, activateMediator: Boolean = true): TreeItem<MediatedItem>{
     val newItem: TreeItem<MediatedItem> = TreeItem(MediatedItem())
     newItem.value.text = thisNodeName
     val mediator = TreeViewNodeMediatorView(newItem, subject, obj)
@@ -188,7 +201,8 @@ class ChildObj: Obj(){
                         when (val model = item.value.itemMediator.model) {                                
                             // this code is pretty generic and will need you own specific types
                             is SubjectList.Item -> {
-                                addChildNodeMediator(item, "someName", "Child Items", model.someOtherList, SomeOtherList(model.someOtherList))                                    
+                                addChildNodeMediator(item, "someName", "Child Items", model.someOtherList, 
+                                                                SomeOtherList(model.someOtherList))                                    
                             }
                         }
                     }
