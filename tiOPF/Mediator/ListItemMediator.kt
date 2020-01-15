@@ -18,7 +18,7 @@ open class ListItemMediator: Object() {
     var onBeforeSetupField: OnBeforeSetupField? = null
     val displayNames: String get() = fieldsInfo!!.asString()
     internal var fieldsInfoPrivate: MediatorFieldInfoList? = null
-    var fieldsInfo: MediatorFieldInfoList? = fieldsInfoPrivate;  get() = fieldsInfoPrivate
+    var fieldsInfo: MediatorFieldInfoList? get() = fieldsInfoPrivate; set(value) { fieldsInfoPrivate = value}
     open fun close(){
         active = false
         model = null

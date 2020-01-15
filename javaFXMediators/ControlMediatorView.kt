@@ -82,6 +82,8 @@ abstract class ControlMediatorView<T: Control>: MediatorView<T>(){
 
         // using Any and toString() allow this to work with any type.
         val valueRef = ValueReference(getObjectProperty<Any>(subject!!, fieldName))
+        if (valueRef.value == null)
+            valueRef.value = ""
         var prop = getPropFromPath(view!!::class, guiFieldName, ValueReference(view!!))
         if (prop == null) {
             val setterName = "set" + guiFieldName.capitalize()

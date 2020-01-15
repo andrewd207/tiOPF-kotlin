@@ -102,7 +102,7 @@ open class Object(): Visited(), IObject<Object> {
                 PerObjectState.Update,
                 PerObjectState.Delete,
                 PerObjectState.Deleted -> { } // do nothing
-                else -> EtiOPFProgrammerException(CErrorInvalidObjectState)
+                else -> throw EtiOPFProgrammerException(CErrorInvalidObjectState)
             }
 
         }
