@@ -98,6 +98,54 @@ fun checkTableExists(){
 }
 ~~~
 
+## How an object connects to a persistence layer
+
+The Object.read() and Object.save() functions cause the objects to be visited by the persistence layer. The visitors need 
+to be registered before they can be executed.
+~~~
+GTIOPFManager().visitorManager.registerVisitor("ReadFoo", Foo_Read::class as KClass<Visitor>)
+GTIOPFManager().visitorManager.registerVisitor("SaveFoo", Foo_Delete::class as KClass<Visitor>)
+GTIOPFManager().visitorManager.registerVisitor("SaveFoo", Foo_Update::class as KClass<Visitor>)
+GTIOPFManager().visitorManager.registerVisitor("SaveFoo", Foo_Create::class as KClass<Visitor>)
+~~~
+*Foo_Read* might look like this:
+~~~
+class Foo_Read: VisitorSelect(){
+    override fun acceptVisitor(): Boolean {
+        return (visited is Foo && (visited!!.objectState in setOf(Object.PerObjectState.PK, Object.PerObjectState.Clean )))
+    }
+
+    override fun init() {
+        query!!.sqlText = "SELECT * FROM TEST WHERE OID = :OID"
+    }
+
+    override fun setupParams() {
+        (visited as Foo).oid.assignToQuery("OID", query!!)
+    }
+
+    override fun mapRowToObject() {
+        val obj = visited as MyObj
+        obj.oid.assignFromQuery("OID",query!!)
+        obj.name = query!!.getFieldAsString("C_NAME")
+        obj.age  = query!!.getFieldAsInteger("C_AGE").toInt()
+    }
+}
+~~~
+
+Then in Foo override the .read() function
+~~~
+override fun read(dbConnectionName: String, persistenceLayerName: String) {
+    GTIOPFManager().visitorManager.execute("ReadFoo", this, dbConnectionName, persistenceLayerName)
+}
+~~~
+
+### Wait! This is a lot of code!
+Yes. It also comes with the benefit/drawback of extreme flexibility.
+
+There exists a program "mapper" mentioned at the start that I am currently working on creating a Kotlin version of.
+You define your objects in xml and it generates all this code for you. As an alternative, I think it also may be 
+relatively easy to generate this generic sql using tiOPF's AutoMap. Famous last words? :/ 
+
 # Using Mediators
 
 So far, some mediators for JavaFX widgets are implemented. Text Widgets, ComboBoxes, Lists, Trees, etc. See the 
