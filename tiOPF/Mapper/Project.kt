@@ -66,8 +66,8 @@ class Project: Object() {
                     }
                 }
                 @Published var prop = ""; set(value) {beginUpdate(); field = value; endUpdate()}
-                @Published var type = Type.Required
-                @Published var value: String? = null
+                @Published var type = Type.Required; set(value) {beginUpdate(); field = value; endUpdate()}
+                @Published var value: String? = null; set(value) {beginUpdate(); field = value; endUpdate()}
             }
 
             class Mapping:Object(){

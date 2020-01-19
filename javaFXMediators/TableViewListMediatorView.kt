@@ -7,10 +7,13 @@ import javafx.event.EventHandler
 import javafx.scene.control.*
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import tiOPF.*
 import tiOPF.Mediator.MediatorFieldInfo
-import tiOPF.getObjectProperty
-import tiOPF.getPropertyClass
-import tiOPF.setObjectProperty
+import kotlin.reflect.KClass
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.declaredMembers
+import kotlin.reflect.full.isSubclassOf
 
 class TableViewListMediatorView: ObservableListControlMediatorView<CustomFXTableView, MediatedItem>(){
     open class CustomListItemCell(val propName: String): TableCell<MediatedItem, MediatedItem>(){
@@ -19,6 +22,18 @@ class TableViewListMediatorView: ObservableListControlMediatorView<CustomFXTable
                 return getObjectProperty(item.itemMediator.model!!, propName)
             }
             return null
+        }
+        fun getFieldClass(item: MediatedItem?): KClass<*>?{
+            if (item != null) {
+                val instance = item.itemMediator.model!!
+                val prop = getPropFromPath(instance::class, propName, ValueReference(instance))
+                return if (prop != null) {
+                    prop.getter.returnType.classifier as KClass<*>
+                } else
+                    null
+            }
+            return null
+
         }
         protected val mediatedItem: MediatedItem? get() {
             return if (tableView != null && tableView.editingCell != null)
@@ -102,7 +117,7 @@ class TableViewListMediatorView: ObservableListControlMediatorView<CustomFXTable
 
             if (true) {
                 escapePressed = false
-                textField.text = getFieldValue(mediatedItem)
+                textField.text = getFieldValue<Any>(mediatedItem).toString()
 
                 text = null
                 graphic = textField
@@ -119,7 +134,36 @@ class TableViewListMediatorView: ObservableListControlMediatorView<CustomFXTable
         override fun commitEdit(newValue: MediatedItem?) {
             //println("commit ${textField.text}")
             text = textField.text
-            item.itemMediator.model?.setPropValue(propName, textField.text)
+            val model = item.itemMediator.model
+            if (model != null) {
+                when (val kClass = getFieldClass(newValue)) {
+                    String::class -> model.setPropValue(propName, text)
+                    Int::class -> model.setPropValue(propName, text.toInt())
+                    Double::class -> model.setPropValue(propName, text.toDouble())
+                    Float::class -> model.setPropValue(propName, text.toFloat())
+                    Long::class -> model.setPropValue(propName, text.toLong())
+                    Boolean::class -> model.setPropValue(propName, text.toBoolean())
+
+                    null -> {}//throw Exception("field class is null")
+                    else -> {
+                        if (kClass.isSubclassOf(Enum::class)) {
+                            val valuesCallable = kClass.declaredMembers.find { it.name == "values"}
+                            if (valuesCallable != null) {
+                                val values = valuesCallable.call() as Array<Enum<*>>
+                                values.forEach {
+                                    if (it.name.equals(text, true)) {
+                                        model.setPropValue(propName, it)
+                                        return@forEach
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            //item.itemMediator.model?.setPropValue(propName, textField.text)
 
             escapePressed = true
 
@@ -293,7 +337,13 @@ class TableViewListMediatorView: ObservableListControlMediatorView<CustomFXTable
         return item
     }
 
-    override fun setItemText(item: MediatedItem, text: String) { item.text = text  }
+    override fun setItemText(item: MediatedItem, text: String) {
+        item.text = text
+        val index = view!!.items.indexOf(item)
+        if (index > -1) {
+            view!!.items[index] = item // to trigger update
+        }
+    }
     override fun getItemMediator(item: MediatedItem): ObservableControlItemMediator<MediatedItem> {
         return item.itemMediator as ObservableControlItemMediator<MediatedItem>
     }
