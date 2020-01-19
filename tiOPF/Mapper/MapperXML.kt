@@ -106,6 +106,7 @@ class MapperXML(private val project: Project) {
                     Float::class -> prop.setter.call(o, it.nodeValue.toFloat())
                     Boolean::class -> prop.setter.call(o, it.nodeValue!!.toBoolean())
                     Project.EnumType::class -> prop.setter.call(o, Project.EnumType.valueOf(it.nodeValue.capitalize()))
+                    Project.Unit.ClassItem.Validator.Type::class -> prop.setter.call(o, Project.Unit.ClassItem.Validator.Type.fromString(it.nodeValue.capitalize()))
                     else -> LOG("unhandled attr :${propClass.simpleName}")
                 }
             }
@@ -218,6 +219,7 @@ class MapperXML(private val project: Project) {
                         }
                         is Int, is Boolean, is Float -> parent.setAttribute(nodeName, value.toString())
                         is Project.EnumType -> parent.setAttribute(nodeName, value.toString().toLowerCase())
+                        is Project.Unit.ClassItem.Validator.Type -> parent.setAttribute(nodeName, value.toString())
                         is Project.Unit.ClassItem.Selection.SelectionType -> parent.setAttribute(nodeName, value.toString().toLowerCase())
                         is Project.Unit.ClassItem.Mapping -> {
                             val node = doc.createElement(nodeName)

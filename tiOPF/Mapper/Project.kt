@@ -33,8 +33,40 @@ class Project: Object() {
                 @Published var virtual: Boolean? = null
             }
             class Validator :Object(){
+                enum class Type {
+                    Required,
+                    Greater,
+                    GreaterEqual,
+                    Less,
+                    LessEqual,
+                    NotEqual,
+                    RegExp;
+                    override fun toString(): String {
+                        return when(this){
+                            GreaterEqual -> "Greater-Equal"
+                            LessEqual    -> "Less-Equal"
+                            NotEqual     -> "Not-Equal"
+                            RegExp       -> "Reg-Exp"
+                            else         -> this.name
+                        }
+                    }
+                    companion object {
+                        fun fromString(s: String): Type{
+                            return when (s.toLowerCase()){
+                                "required"     -> Required
+                                "greater"       -> Greater
+                                "greater-equal" -> GreaterEqual
+                                "less"          -> Less
+                                "less-equal"    -> LessEqual
+                                "not-equal"     -> NotEqual
+                                "reg-exp"       -> RegExp
+                                else -> throw Exception("unhandled Validator type: $s")
+                            }
+                        }
+                    }
+                }
                 @Published var prop = ""; set(value) {beginUpdate(); field = value; endUpdate()}
-                @Published var type = ""
+                @Published var type = Type.Required
                 @Published var value: String? = null
             }
 
@@ -81,6 +113,7 @@ class Project: Object() {
             @Published var notifyObservers = true
             @ItemClass(Prop::class)
             @Published @Item("prop")var classProps = ObjectList<Prop>()
+            @ItemClass(Validator::class)
             @Published var validators = ObjectList<Validator>()
             @Comment("Mapping into the tiOPF framework")
             @Published val mapping = Mapping()

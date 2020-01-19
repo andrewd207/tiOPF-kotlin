@@ -15,8 +15,7 @@ class TextAreaMediatorView: TextInputControlMediatorView<TextArea>() {
     companion object: TextAreaMediatorViewCompanion()
 
     override fun doObjectToGUI() {
-        val value = subject!!.getPropValue<Any>(fieldName)
-        when (value) {
+        when (val value = subject!!.getPropValue<Any>(fieldName)) {
             is String -> view!!.text = value
             is Collection<*> -> {
                 var newValue = ""
@@ -36,15 +35,14 @@ class TextAreaMediatorView: TextInputControlMediatorView<TextArea>() {
     override fun doGUIToObject() {
         checkFieldNames()
         val prop = getPropFromPath(subject!!::class, fieldName, ValueReference(subject!!))
-        val propClass = prop!!.getter.returnType.classifier as KClass<*>
-        when (propClass) {
+        when (val propClass = prop!!.getter.returnType.classifier as KClass<*>) {
             String::class -> subject!!.setPropValue(fieldName, view!!.text)
             Int::class -> subject!!.setPropValue(fieldName, view!!.text.toInt())
             Long::class -> subject!!.setPropValue(fieldName, view!!.text.toLong())
             Float::class -> subject!!.setPropValue(fieldName, view!!.text.toFloat())
             Double::class -> subject!!.setPropValue(fieldName, view!!.text.toDouble())
-            Boolean::class -> subject!!.setPropValue(fieldName, view!!.text.toBoolean())
-            else ->
+            Boolean::class -> subject!!.setPropValue(fieldName, view!!.text!!.toBoolean())
+            else -> {
                 if (propClass.isSubclassOf(MutableList::class)) {
                     // we are hoping for mutable Collection<String> else this could go badly
                     val values = view!!.text.split("\n")
@@ -52,6 +50,7 @@ class TextAreaMediatorView: TextInputControlMediatorView<TextArea>() {
                     list!!.clear()
                     list.addAll(values)
                 }
+            }
 
         }
     }
