@@ -158,6 +158,10 @@ class TableViewListMediatorView: ObservableListControlMediatorView<CustomFXTable
                                 }
                             }
                         }
+                        else {
+                            throw Exception("Unsupported data type for $propName: $kClass")
+                        }
+
                     }
                 }
             }
