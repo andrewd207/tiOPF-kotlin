@@ -1,6 +1,8 @@
-package tiOPF
+package tiOPF.Layers
 
 
+import tiOPF.*
+import tiOPF.List
 import tiOPF.Log.LOG
 import tiOPF.Log.LogSeverity
 import java.sql.*
@@ -12,7 +14,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.companionObjectInstance
 
 open class QueryJDBC : QuerySQL(){
-    companion object: IQueryCompanion{
+    companion object: IQueryCompanion {
         override fun createInstance(): Query {
             return QueryJDBC()
         }
@@ -64,7 +66,8 @@ open class QueryJDBC : QuerySQL(){
                     val end = i
                     val entry = text.substring(start, end)
                     LOG("converting '$entry' to '?' for JDBC at index ${sqlParamMap.count()+1}", LogSeverity.SQL)
-                    sqlParamMap[entry] = ParamEntry(entry, sqlParamMap.count()+1)
+                    sqlParamMap[entry] =
+                        ParamEntry(entry, sqlParamMap.count() + 1)
                     i -= end-start+1 //+1 because of ?
                     cont = false
                 }
@@ -397,7 +400,7 @@ open class QueryJDBC : QuerySQL(){
             QueryType.Insert -> result = statement!!.executeUpdate().toLong()
             QueryType.Update -> result = statement!!.executeUpdate().toLong()
             QueryType.Delete -> result = statement!!.executeUpdate().toLong()
-            QueryType.DDL    -> statement!!.execute()
+            QueryType.DDL -> statement!!.execute()
 
         }
 
@@ -480,7 +483,11 @@ open class QueryJDBC : QuerySQL(){
                             -> return QueryFieldKind.DateTime
 
             }
-            throw EtiOPFException(CTIOPFUnsupportedFieldType.format(type))
+            throw EtiOPFException(
+                CTIOPFUnsupportedFieldType.format(
+                    type
+                )
+            )
 
         }
 
@@ -498,7 +505,7 @@ open class QueryJDBC : QuerySQL(){
     }
 }
 
-interface IDatabaseJDBCCompanion: IDatabaseCompanion{
+interface IDatabaseJDBCCompanion: IDatabaseCompanion {
     val driver: Driver? get() {
             LOG("Requesting driver instance from JDBC: ${getDriverName()}", LogSeverity.ConnectionPool)
             return DriverManager.getDriver(getDriverName())
@@ -593,7 +600,7 @@ class DatabaseNameAsParts(val databaseName: String, val driverName: String){
 }
 
 abstract class DatabaseJDBC: DatabaseSQL(){
-    companion object: IDatabaseJDBCCompanion{
+    companion object: IDatabaseJDBCCompanion {
         var privDriver: Driver? = null
         override val driver: Driver?
             get() {
@@ -632,7 +639,8 @@ abstract class DatabaseJDBC: DatabaseSQL(){
             if (value && !connected){
                 val props = Properties()
                 val companion = this::class.companionObjectInstance as IDatabaseJDBCCompanion
-                val dbParts = DatabaseNameAsParts(databaseName, companion.getDriverName())
+                val dbParts =
+                    DatabaseNameAsParts(databaseName, companion.getDriverName())
 
 
                 try {
@@ -641,7 +649,13 @@ abstract class DatabaseJDBC: DatabaseSQL(){
                     connection = companion.connect(url, userName, password, props)
                 }
                 catch (e: Exception){
-                    throw EtiOPFDBExceptionUserNamePassword("${className()}\n", databaseName, userName, password, "Error attempting to connect to database.\n${e}")
+                    throw EtiOPFDBExceptionUserNamePassword(
+                        "${className()}\n",
+                        databaseName,
+                        userName,
+                        password,
+                        "Error attempting to connect to database.\n${e}"
+                    )
                 }
             }
         }

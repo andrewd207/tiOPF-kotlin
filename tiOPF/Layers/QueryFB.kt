@@ -1,13 +1,14 @@
-package tiOPF
+package tiOPF.Layers
 
 import org.firebirdsql.gds.impl.GDSFactory
 import org.firebirdsql.management.FBManager
+import tiOPF.*
 import java.sql.Connection
 import java.util.*
 import kotlin.reflect.KClass
 
 class QueryFB: QueryJDBC() {
-    companion object: IQueryCompanion{
+    companion object: IQueryCompanion {
         override fun createInstance(): Query {
             return QueryFB()
         }
@@ -18,7 +19,7 @@ class QueryFB: QueryJDBC() {
 
 
 class DatabaseFB: DatabaseJDBC(){
-    companion object:  IDatabaseJDBCCompanion{
+    companion object: IDatabaseJDBCCompanion {
         override fun connect(url: String, user: String, password: String, props: Properties): Connection? {
             props.setProperty("user", user)
             props.setProperty("password", password)
@@ -46,7 +47,10 @@ class DatabaseFB: DatabaseJDBC(){
         }
 
         override fun databaseExists(databaseName: String, userName: String, password: String, params: String): Boolean {
-            val dbParts  = DatabaseNameAsParts(databaseName, getDriverName())
+            val dbParts  = DatabaseNameAsParts(
+                databaseName,
+                getDriverName()
+            )
             val props = Properties()
             props.setProperty("user", userName)
             props.setProperty("password", password)
@@ -68,7 +72,10 @@ class DatabaseFB: DatabaseJDBC(){
         override fun createDatabase(databaseName: String, userName: String, password: String, params: String) {
             // some hints: the path of the database must be accessible from the firebird user!
             // on my pc the folder is owned by firefird:firebird user/group and it works.
-            val dbParts  = DatabaseNameAsParts(databaseName, getDriverName())
+            val dbParts  = DatabaseNameAsParts(
+                databaseName,
+                getDriverName()
+            )
             val type = GDSFactory.getDefaultGDSType()
             val manager = FBManager(type)
             manager.password = password
@@ -95,7 +102,8 @@ class DatabaseFB: DatabaseJDBC(){
         return QueryFB::class as KClass<Query>
     }
     override fun readMetadataTables(data: DBMetadata) {
-        val query = GTIOPFManager().persistanceLayers.createQuery(DatabaseFB::class as KClass<Database>)
+        val query = GTIOPFManager()
+            .persistanceLayers.createQuery(DatabaseFB::class as KClass<Database>)
         startTransaction()
         try
         {
@@ -145,7 +153,8 @@ class DatabaseFB: DatabaseJDBC(){
     override fun readMetadataFields(data: DBMetadataTable) {
         val table = data
         val tableName = table.name.toUpperCase()
-        val query = GTIOPFManager().persistanceLayers.createQuery(DatabaseFB::class as KClass<Database>)
+        val query = GTIOPFManager()
+            .persistanceLayers.createQuery(DatabaseFB::class as KClass<Database>)
 
         startTransaction()
         try {
@@ -162,7 +171,9 @@ class DatabaseFB: DatabaseJDBC(){
             query.open()
             while (!query.eof) {
                 val field = DBMetadataField()
-                val fieldType = FieldType.fromInt (query.getFieldAsInteger("field_type").toInt())
+                val fieldType = FieldType.fromInt(
+                    query.getFieldAsInteger("field_type").toInt()
+                )
                 val fieldLength =  query.getFieldAsInteger("field_length")
                 field.name = query.getFieldAsString("field_name").trim()
                 field.width = 0
@@ -214,14 +225,14 @@ class DatabaseFB: DatabaseJDBC(){
             fieldExt += " PRIMARY KEY"
         return (
                 when (fieldMetadata.kind) {
-                    Query.QueryFieldKind.String     -> "VARCHAR(${fieldMetadata.width})"
-                    Query.QueryFieldKind.Int64      -> "INT64"
-                    Query.QueryFieldKind.Integer    -> "INTEGER"
-                    Query.QueryFieldKind.Float      -> "DOUBLE"
-                    Query.QueryFieldKind.Money      -> "DECIMAL(18,4)"
-                    Query.QueryFieldKind.DateTime   -> "TIMESTAMP"
-                    Query.QueryFieldKind.Logical    -> "CHAR(1) default 'F' check($fieldName) in ('T', 'F'))"
-                    Query.QueryFieldKind.Binary     -> "BLOB"
+                    Query.QueryFieldKind.String -> "VARCHAR(${fieldMetadata.width})"
+                    Query.QueryFieldKind.Int64 -> "INT64"
+                    Query.QueryFieldKind.Integer -> "INTEGER"
+                    Query.QueryFieldKind.Float -> "DOUBLE"
+                    Query.QueryFieldKind.Money -> "DECIMAL(18,4)"
+                    Query.QueryFieldKind.DateTime -> "TIMESTAMP"
+                    Query.QueryFieldKind.Logical -> "CHAR(1) default 'F' check($fieldName) in ('T', 'F'))"
+                    Query.QueryFieldKind.Binary -> "BLOB"
                     Query.QueryFieldKind.LongString -> "BLOB SUB_TYPE TEXT"
                     //Query.QueryFieldKind.Macro
                     else -> throw EtiOPFInternalException("Invalid fieldKind")
@@ -230,8 +241,9 @@ class DatabaseFB: DatabaseJDBC(){
 }
 
 class PersistanceLayerFB: PersistanceLayerJDBC(){
-    companion object: IPersistenceLayerClass{
-        override fun createInstance(): PersistenceLayer { return PersistanceLayerFB()}
+    companion object: IPersistenceLayerClass {
+        override fun createInstance(): PersistenceLayer { return PersistanceLayerFB()
+        }
         init {
             GTIOPFManager().persistanceLayers.__registerPersistenceLayer(this)
         }
@@ -243,9 +255,9 @@ class PersistanceLayerFB: PersistanceLayerJDBC(){
 
 
     override val queryCompanion: IQueryCompanion
-        get() = QueryFB.Companion
+        get() = QueryFB
     override val databaseCompanion: IDatabaseCompanion
-        get() = DatabaseFB.Companion
+        get() = DatabaseFB
 
     override fun assignPersistenceLayerDefaults(defaults: PersistanceLayerDefaults) {
         defaults.persistanceLayerName = CPersistJDBCFirebird

@@ -1,18 +1,17 @@
-package tiOPF
+package tiOPF.Layers
 
+import tiOPF.*
 import tiOPF.Log.LOG
-import tiOPF.Log.LogLevel
 import tiOPF.Log.LogSeverity
 import java.io.File
+import tiOPF.Object
 import java.sql.Connection
-import java.sql.Driver
-import java.sql.DriverManager
 import java.util.*
 import kotlin.Exception
 import kotlin.reflect.KClass
 
 class QuerySqlite: QueryJDBC() {
-    companion object: IQueryCompanion{
+    companion object: IQueryCompanion {
         override fun createInstance(): Query {
             return QuerySqlite()
         }
@@ -22,7 +21,7 @@ class QuerySqlite: QueryJDBC() {
 }
 
 class DatabaseSqlite: DatabaseJDBC(){
-    companion object:  IDatabaseJDBCCompanion{
+    companion object: IDatabaseJDBCCompanion {
 
         override fun connect(url: String, user: String, password: String, props: Properties): Connection? {
             val drv = driver

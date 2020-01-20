@@ -1,13 +1,12 @@
-package tiOPF
+package tiOPF.Layers
 
+import tiOPF.*
 import java.sql.Connection
-import java.sql.Driver
-import java.sql.DriverManager
 import java.util.*
 import kotlin.reflect.KClass
 
 class QueryMariaDB: QueryJDBC() {
-    companion object: IQueryCompanion{
+    companion object: IQueryCompanion {
         override fun createInstance(): Query {
             return QueryMariaDB()
         }
@@ -16,7 +15,7 @@ class QueryMariaDB: QueryJDBC() {
 }
 
 class DatabaseMariaDB: DatabaseJDBC(){
-    companion object:  IDatabaseJDBCCompanion{
+    companion object: IDatabaseJDBCCompanion {
 
         override fun connect(url: String, user: String, password: String, props: Properties): Connection? {
             props.setProperty("user", user)
@@ -80,14 +79,14 @@ class DatabaseMariaDB: DatabaseJDBC(){
             fieldExt += " PRIMARY KEY"
         return (
                 when (fieldMetadata.kind) {
-                    Query.QueryFieldKind.String     -> "CHAR(${fieldMetadata.width})"
-                    Query.QueryFieldKind.Int64      -> "BIGINT"
-                    Query.QueryFieldKind.Integer    -> "INT"
-                    Query.QueryFieldKind.Float      -> "DOUBLE"
-                    Query.QueryFieldKind.Money      -> "DECIMAL(18,4)"
-                    Query.QueryFieldKind.DateTime   -> "DATETIME"
-                    Query.QueryFieldKind.Logical    -> "BOOLEAN"
-                    Query.QueryFieldKind.Binary     -> "LONGBLOB"
+                    Query.QueryFieldKind.String -> "CHAR(${fieldMetadata.width})"
+                    Query.QueryFieldKind.Int64 -> "BIGINT"
+                    Query.QueryFieldKind.Integer -> "INT"
+                    Query.QueryFieldKind.Float -> "DOUBLE"
+                    Query.QueryFieldKind.Money -> "DECIMAL(18,4)"
+                    Query.QueryFieldKind.DateTime -> "DATETIME"
+                    Query.QueryFieldKind.Logical -> "BOOLEAN"
+                    Query.QueryFieldKind.Binary -> "LONGBLOB"
                     Query.QueryFieldKind.LongString -> "LONGTEXT"
                     //Query.QueryFieldKind.Macro
                     else -> throw EtiOPFInternalException("Invalid fieldKind")
@@ -96,8 +95,9 @@ class DatabaseMariaDB: DatabaseJDBC(){
 }
 
 class PersistanceLayerMariaDB: PersistanceLayerJDBC(){
-    companion object: IPersistenceLayerClass{
-        override fun createInstance(): PersistenceLayer { return PersistanceLayerMariaDB()}
+    companion object: IPersistenceLayerClass {
+        override fun createInstance(): PersistenceLayer { return PersistanceLayerMariaDB()
+        }
         init {
             GTIOPFManager().persistanceLayers.__registerPersistenceLayer(this)
         }
@@ -109,9 +109,9 @@ class PersistanceLayerMariaDB: PersistanceLayerJDBC(){
 
 
     override val queryCompanion: IQueryCompanion
-        get() = QueryMariaDB.Companion
+        get() = QueryMariaDB
     override val databaseCompanion: IDatabaseCompanion
-        get() = DatabaseMariaDB.Companion
+        get() = DatabaseMariaDB
 
     override fun assignPersistenceLayerDefaults(defaults: PersistanceLayerDefaults) {
         defaults.persistanceLayerName = CPersistJDBCMariaDB
