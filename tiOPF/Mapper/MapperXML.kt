@@ -18,14 +18,22 @@ import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 
-fun Project.writeToXML(file: File){
-    val mapperXML = MapperXML(this)
-    mapperXML.write(FileOutputStream(file))
+fun Project.loadFromFile(file: File){
+    val stream = FileInputStream(file)
+    MapperXML(this).read(stream)
 }
 
-fun Project.readFromXML(file: File){
-    val mapperXML = MapperXML(this)
-    mapperXML.read(FileInputStream(file))
+fun Project.saveToFile(file: File){
+    val stream = FileOutputStream(file)
+    MapperXML(this).write(stream)
+}
+
+fun Project.loadFromFile(fileName: String){
+    loadFromFile(File(fileName))
+}
+
+fun Project.saveToFile(fileName: String){
+    saveToFile(File(fileName))
 }
 
 class MapperXML(private val project: Project) {

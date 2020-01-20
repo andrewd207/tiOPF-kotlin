@@ -10,27 +10,27 @@ class Project: Object() {
         String
     }
     class Include: Object(){
-        @Published var fileName = ""
+        @Published var fileName = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
     }
     class Unit : Object(){
         class Reference: Object(){
-            @Published var name= "" ; set(value) {beginUpdate(); field = value; endUpdate()}
+            @Published var name= "" ; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
         }
         class Enum :Object(){
             class EnumItem: Object(){
-                @Published var name = ""; set(value) {beginUpdate(); field = value; endUpdate()}
-                @Published var value: Any? = null // string or int value
+                @Published var name = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                @Published var value: Any? = null; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}} // string or int value
             }
-            @Published var name = ""; set(value) {beginUpdate(); field = value; endUpdate()}
-            @Published var set: String? = null
+            @Published var name = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+            @Published var set: String? = null; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
             @ItemClass(EnumItem::class)
             @Published @Item("item") val values = ObjectList<EnumItem>()
         }
         class ClassItem :Object(){
             class Prop: Object(){
-                @Published var name = ""; set(value) {beginUpdate(); field = value; endUpdate()}
-                @Published var type = ""
-                @Published var virtual: Boolean? = null
+                @Published var name = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                @Published var type = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                @Published var virtual: Boolean? = null; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
             }
             class Validator :Object(){
                 enum class Type {
@@ -65,21 +65,21 @@ class Project: Object() {
                         }
                     }
                 }
-                @Published var prop = ""; set(value) {beginUpdate(); field = value; endUpdate()}
-                @Published var type = Type.Required; set(value) {beginUpdate(); field = value; endUpdate()}
-                @Published var value: String? = null; set(value) {beginUpdate(); field = value; endUpdate()}
+                @Published var prop = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                @Published var type = Type.Required; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                @Published var value: String? = null; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
             }
 
             class Mapping:Object(){
                 class PropMap:Object(){
-                    @Published var prop = ""; set(value) {beginUpdate(); field = value; endUpdate()}
-                    @Published var field = ""
-                    @Published var type = ""
+                    @Published var prop = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                    @Published var field = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                    @Published var type = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
                 }
-                @Published var table = ""
-                @Published var pk = "OID"
-                @Published var pkField = "OID"
-                @Published var oidType = "string"
+                @Published var table = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                @Published var pk = "OID"; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                @Published var pkField = "OID"; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                @Published var oidType = "String"; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
                 @ItemClass(PropMap::class)
                 @Published @NoParent@Item("prop-map") val mappings = ObjectList<PropMap>()
 
@@ -88,29 +88,29 @@ class Project: Object() {
                 enum class SelectionType{
                     Func
                 }
-                @Published var name = ""; set(value) {beginUpdate(); field = value; endUpdate()}
+                @Published var name = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
                 @Published abstract val type: SelectionType
             }
             class SelectionFunction: Selection() {
                 class Param: Object(){
-                    @Published var name = ""; set(value) {beginUpdate(); field = value; endUpdate()}
-                    @Published var type = ""
-                    @Published var typeName = ""
-                    @Published var passBy = ""
-                    @Published var sqlParam = ""
+                    @Published var name = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                    @Published var type = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                    @Published var typeName = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                    @Published var passBy = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+                    @Published var sqlParam = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
                 }
                 @Published override val type = SelectionType.Func
 
                 @ItemClass(Param::class)
                 @Published val params = ObjectList<Param>()
-                @Published @CDATA var sql: String? = null
+                @Published @CDATA var sql: String? = null; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
             }
-            @Published var baseClass = ""; set(value) {beginUpdate(); field = value; endUpdate()}
-            @Published var baseClassParent = "Object"
-            @Published var autoMap = false
-            @Published var autoCreateList = true
-            @Published var oidType = "String"
-            @Published var notifyObservers = true
+            @Published var baseClass = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+            @Published var baseClassParent = "Object"; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+            @Published var autoMap = false; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+            @Published var autoCreateList = true; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+            @Published var oidType = "String"; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+            @Published var notifyObservers = true; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
             @ItemClass(Prop::class)
             @Published @Item("prop")var classProps = ObjectList<Prop>()
             @ItemClass(Validator::class)
@@ -120,7 +120,7 @@ class Project: Object() {
             @ItemClass(Selection::class)
             @Published @Item("select")val selections = ObjectList<Selection>()
         }
-        @Published var name = "" ; set(value) { beginUpdate(); field = value; endUpdate()}
+        @Published var name = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
         @ItemClass(Reference::class)
         @Published @Item("reference") var references =  ObjectList<Reference>()
         @Comment("Enumerations defined here")
@@ -130,12 +130,12 @@ class Project: Object() {
         @ItemClass(ClassItem::class)
         @Published @Item("class") var classes = ObjectList<ClassItem>()
     }
-    @Published var tabSpaces = 2
-    @Published var beginEndTabs = 1
-    @Published var projectName = ""; set(value) {beginUpdate(); field = value; endUpdate()}
-    @Published var enumType = EnumType.Int
-    @Published var visibilityTabs = 0
-    @Published var outputdir = "../bom/"
+    @Published var tabSpaces = 2; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+    @Published var beginEndTabs = 1; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+    @Published var projectName = ""; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+    @Published var enumType = EnumType.Int; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+    @Published var visibilityTabs = 0; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
+    @Published var outputdir = "../bom/"; set(value) {if (value != field) { beginUpdate(); field = value; endUpdate()}}
     @Comment("Includes are added to this schema before build-time.")
     @ItemClass(Include::class)
     @Published var includes = ObjectList<Include>()
