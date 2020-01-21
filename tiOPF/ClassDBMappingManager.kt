@@ -1,6 +1,9 @@
 package tiOPF
 // complete
+import tiOPF.Log.LOG
+import tiOPF.Log.LogSeverity
 import kotlin.reflect.KClass
+import kotlin.reflect.full.findAnnotation
 
 class ClassDBMappingManager: Object() {
     val classMaps =  ClassMaps()
@@ -17,6 +20,42 @@ class ClassDBMappingManager: Object() {
         attrMap.objectState = PerObjectState.Clean
         attrColMaps.addMapping(attrMap, dbColMap)
     }
+    fun registerMapping(kClass: KClass<*>, tableName: String? = null, oidField: String = ""){
+        var table = ""
+        val published = kClass.findAnnotation<PublishedClass>()
+
+        table = if (tableName.isNullOrEmpty()) {
+            if (published == null || published.persistenceHint.isEmpty())
+                throw Exception("Neither tableName or class annotation Published(\"tableName\") is set for ${kClass.simpleName}")
+            published.persistenceHint
+        } else
+            tableName
+
+        val oidValue =(
+                if (oidField.isNotEmpty())
+                    oidField
+                else if (published == null || published.oidField.isEmpty())
+                    "OID"
+                else
+                    published.oidField)
+
+        val propList = mutableListOf<String>()
+        val fieldList = mutableListOf<String>()
+        getPublishedPropertyNames(kClass, propList, fieldList)
+
+        registerMapping(kClass, table, "oid", oidValue, setOf(ClassDBMapRelationshipType.Primary))
+        propList.forEachIndexed { index, propName ->
+            if (fieldList[index].isEmpty()){
+                LOG("Skipping adding auto-mapping for ${kClass.simpleName}.$propName because Published is empty", LogSeverity.Visitor)
+            }
+            else {
+                registerMapping(kClass, table, propName, fieldList[index], emptySet())
+            }
+
+
+        }
+    }
+
     fun registerMapping(kClass: KClass<*>, tableName: String, attrName: String, colName: String, pkInfo: PKInfo = setOf()){
         registerMapping("", kClass, tableName, attrName, colName, pkInfo)
     }
