@@ -92,16 +92,16 @@ abstract class VisAutoAbs: ObjectVisitor() {
                     }
                     Query.QueryFieldKind.Integer -> {
                         when (getPropertyType(target, propName)) {
-                            TypeKind.LONG -> setObjectProperty(target, propName, query!!.getFieldAsInteger(propName))
-                            TypeKind.INT -> setObjectProperty(target, propName, query!!.getFieldAsInteger(propName).toInt())
+                            TypeKind.LONG -> setObjectProperty(target, propName, query!!.getFieldAsInteger(colName))
+                            TypeKind.INT -> setObjectProperty(target, propName, query!!.getFieldAsInteger(colName).toInt())
                         }
                     }
-                    Query.QueryFieldKind.Float ->  setObjectProperty(target, propName, query!!.getFieldAsFloat(propName))
-                    Query.QueryFieldKind.DateTime ->  setObjectProperty(target, propName, query!!.getFieldAsDate(propName))
-                    Query.QueryFieldKind.Logical ->  setObjectProperty(target, propName, query!!.getFieldAsBoolean(propName))
+                    Query.QueryFieldKind.Float ->  setObjectProperty(target, propName, query!!.getFieldAsFloat(colName))
+                    Query.QueryFieldKind.DateTime ->  setObjectProperty(target, propName, query!!.getFieldAsDate(colName))
+                    Query.QueryFieldKind.Logical ->  setObjectProperty(target, propName, query!!.getFieldAsBoolean(colName))
                     Query.QueryFieldKind.Binary -> {
                         val value = ValueOut<ByteArray>()
-                        query!!.assignFieldAsByteArray(propName, value)
+                        query!!.assignFieldAsByteArray(colName, value)
                         setObjectProperty(target, propName, value.value)
                     }
                     else -> throw Exception(CErrorInvalidQueryFieldKind)
@@ -277,6 +277,8 @@ open class VisAutoCollectionRead: VisAutoAbs() {
             attrColMaps.removeAll(list)
         }
     }
+
+    protected var setObjectState = false
     private fun setupCriteria(){
         criteria = null
         if (classDBCollection == null)
@@ -295,6 +297,33 @@ open class VisAutoCollectionRead: VisAutoAbs() {
 
 
 
+    }
+
+    override fun execute(visited: Visited?) {
+        super.execute(visited)
+        if (!acceptVisitor())
+            return
+        setObjectState = false
+        classesWithParent.clear()
+        val lCollections = List<ClassDBCollection>()
+        GTIOPFManager().classDBMappingManager.collections.findByCollection(visitedClassType!!, lCollections)
+
+        lCollections.forEachIndexed { index, classDBCollection ->
+            if (index == 0)
+                readDataForParentClass(classDBCollection)
+            else
+                readDataForChildClasses(classDBCollection)
+        }
+
+        setContinueVisiting()
+    }
+
+    override fun acceptVisitor(): Boolean {
+        if (visited != null) {
+            return (visited!!.objectState in arrayOf(Object.PerObjectState.Empty, Object.PerObjectState.PK))
+                    && GTIOPFManager().classDBMappingManager.collections.isCollection(visited!!::class)
+        }
+        return false
     }
 
     protected fun mapRowToObject(checkForDuplicates: Boolean){

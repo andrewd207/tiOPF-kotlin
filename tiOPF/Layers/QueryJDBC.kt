@@ -451,7 +451,7 @@ open class QueryJDBC : QuerySQL(){
 
     override fun fieldIndex(name: String): Int {
         if (resultSet != null)
-            for (i in 0 until resultSet!!.metaData.columnCount){
+            for (i in 1 .. resultSet!!.metaData.columnCount){
                 if (resultSet!!.metaData.getColumnName(i).equals(name))
                     return i
             }

@@ -80,25 +80,28 @@ abstract class QuerySQL: Query() {
             }
         }
 
-        if (criteria != null && criteria.hasCriteria){
-            val criteriaParams = QueryParams()
+        var criteriaParams: QueryParams?  = null
+
+        if (criteria != null && criteria.hasCriteria) {
+            criteriaParams = QueryParams()
             criteriaWhere = criteria.asSql(criteriaParams)
-            if (criteriaWhere.isNotEmpty()){
+            if (criteriaWhere.isNotEmpty()) {
                 lWhere = tiAddTrailingValue(lWhere, " and \n")
-                lWhere+= criteriaWhere
+                lWhere += criteriaWhere
             }
-            if (lWhere.isNotEmpty())
-                sql = "select * from $tableName\n where \n $lWhere"
-            else
-                sql = "select * from $tableName"
-
-            if (criteria != null && criteria.hasOrderBy)
-                sql+= "\n"+ criteria.orderByAsSQL()
-
-            sqlText = sql
-            assignParams(where, criteriaParams)
-            open()
         }
+        sql = if (lWhere.isNotEmpty())
+            "select * from $tableName\n where \n $lWhere"
+        else
+            "select * from $tableName"
+
+        if (criteria != null && criteria.hasOrderBy)
+            sql+= "\n"+ criteria.orderByAsSQL()
+
+        sqlText = sql
+        assignParams(where, criteriaParams)
+        open()
+
 
 
     }
