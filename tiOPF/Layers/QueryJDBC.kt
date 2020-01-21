@@ -477,7 +477,8 @@ open class QueryJDBC : QuerySQL(){
                 java.sql.Types.BOOLEAN
                             -> return QueryFieldKind.Logical
                 java.sql.Types.CHAR,
-                java.sql.Types.VARCHAR
+                java.sql.Types.VARCHAR,
+                java.sql.Types.LONGVARCHAR
                             -> return QueryFieldKind.String
                 java.sql.Types.DATE
                             -> return QueryFieldKind.DateTime
