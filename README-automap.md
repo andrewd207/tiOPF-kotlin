@@ -4,8 +4,7 @@ Automap is the easiest way to connect your objects to a persistence layer. All y
 of your objects with the mapping manager. 
 
 It uses reflection to assign properties and so will be slower than hardcoded 
-visitors. For small databases this is fine but if you are working with something larger, consider using hardcoded 
-visitors.  
+visitors. Consider using hardcoded visitors for a measurable speed improvement.  
 
 With an object and list like this:
 ~~~
@@ -24,7 +23,7 @@ class MyObject(): Object(){
     }
 }
 
-class MyObjectList: ObjectList<MyObject>)
+class MyObjectList: ObjectList<MyObject>()
 ~~~
 
 ## Register properties
@@ -32,12 +31,10 @@ You would register them like this:
 ~~~
 val tableName = "PEOPLE"
 
-// register each property
+// Register class. Each property must be annotated with @Published([fieldName])
+// even tableName can be ommited here if the class is annotated with Published(tableName)
 val manager = GTIOPFManager().classDBMappingManager 
-manager.registerMapping(MyObj::class, tableName, "oid", "OID", 
-    setOf(ClassDBMapRelationshipType.Primary))
-manager.registerMapping(MyObj::class, tableName, "name", "C_NAME")
-manager.registerMapping(MyObj::class, tableName,"age", "C_AGE")
+manager.registerMapping(MyObj::class, tableName)
 
 // register list type
 manager.registerCollection(MyObjectList::class as KClass<PerObjectList>, MyObj::class)
