@@ -34,19 +34,17 @@ abstract class VisAutoAbs: ObjectVisitor() {
         params.clear()
         attrColMaps.forEach {
             val colName = it.dbColMap.colName
+            val property = it.attrMap.property
             val propName = it.attrMap.attrName
             if ((propName.equals("oid", true) || propName.equals("owner.oid", true))
                 && propName.contains("_oid", true))
                 _setOIDParam(colName, propName)
-            else if (getPropertyInheritsFrom(data, propName, OID::class)){
-                val oid: OID? = getObjectProperty(data, propName)
-                if (oid != null){
-                    oid.assignToQueryParam(colName, params)
-
-                }
+            else if (getPropertyInheritsFrom(property, OID::class)){
+                val oid: OID? = getObjectPropertyProp(data, property)
+                oid?.assignToQueryParam(colName, params)
             }
             else
-                params.setValueFromProp(data, propName, colName)
+                params.setValueFromProp(data, property, colName)
         }
     }
     protected abstract fun getWhereAttrColMaps()
@@ -66,14 +64,14 @@ abstract class VisAutoAbs: ObjectVisitor() {
     protected fun queryResultToObject(target: Object, attrColMaps: AttrColMaps){
         fun _setPropValue(attrColMap: AttrColMap){
             val colName = attrColMap.dbColMap.colName
-            val propName = attrColMap.attrMap.attrName
+            val property = attrColMap.attrMap.property//attrColMap.attrMap.attrName
 
-            if (propName.equals("OID", true)){
+            if (property.name.equals("OID", true)){
                 target.oid.assignFromQuery(colName, query!!)
             }
 
-            if (getPropertyInheritsFrom(target, propName, OID::class)){
-                val lOID = getObjectProperty<OID>(target, propName)
+            if (getPropertyInheritsFrom(target, property.name, OID::class)){
+                val lOID = getObjectPropertyProp<OID>(target, property)
                 if (lOID != null){
                     lOID.assignFromQuery(colName, query!!)
                     return
@@ -81,28 +79,28 @@ abstract class VisAutoAbs: ObjectVisitor() {
             }
 
             val fieldKind = query!!.fieldKind(query!!.fieldIndex(colName))
-            if (target.isReadWriteProp(propName) || fieldKind == Query.QueryFieldKind.Binary){
+            if (target.isReadWriteProp(property) || fieldKind == Query.QueryFieldKind.Binary){
                 when (fieldKind) {
                     Query.QueryFieldKind.String,
                     Query.QueryFieldKind.LongString -> {
                         val string = query!!.getFieldAsString(colName)
                         /*if (string.toUpperCase() in arrayOf("T", "F") && getPropertyType(target, propName) == TypeKind.BOOLEAN)
                             setObjectProperty(target, propName, string.toUpperCase() === "T")*/
-                        setObjectProperty(target, propName, string)
+                        setObjectProperty(target, property, string)
                     }
                     Query.QueryFieldKind.Integer -> {
-                        when (getPropertyType(target, propName)) {
-                            TypeKind.LONG -> setObjectProperty(target, propName, query!!.getFieldAsInteger(colName))
-                            TypeKind.INT -> setObjectProperty(target, propName, query!!.getFieldAsInteger(colName).toInt())
+                        when (getPropertyType(property)) {
+                            TypeKind.LONG -> setObjectProperty(target, property, query!!.getFieldAsInteger(colName))
+                            TypeKind.INT -> setObjectProperty(target, property, query!!.getFieldAsInteger(colName).toInt())
                         }
                     }
-                    Query.QueryFieldKind.Float ->  setObjectProperty(target, propName, query!!.getFieldAsFloat(colName))
-                    Query.QueryFieldKind.DateTime ->  setObjectProperty(target, propName, query!!.getFieldAsDate(colName))
-                    Query.QueryFieldKind.Logical ->  setObjectProperty(target, propName, query!!.getFieldAsBoolean(colName))
+                    Query.QueryFieldKind.Float ->  setObjectProperty(target, property, query!!.getFieldAsFloat(colName))
+                    Query.QueryFieldKind.DateTime ->  setObjectProperty(target, property, query!!.getFieldAsDate(colName))
+                    Query.QueryFieldKind.Logical ->  setObjectProperty(target, property, query!!.getFieldAsBoolean(colName))
                     Query.QueryFieldKind.Binary -> {
                         val value = ValueOut<ByteArray>()
                         query!!.assignFieldAsByteArray(colName, value)
-                        setObjectProperty(target, propName, value.value)
+                        setObjectProperty(target, property, value.value)
                     }
                     else -> throw Exception(CErrorInvalidQueryFieldKind)
 

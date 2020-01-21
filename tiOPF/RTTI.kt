@@ -1,9 +1,6 @@
 package tiOPF
 
-import kotlin.reflect.KClass
-import kotlin.reflect.KMutableProperty
-import kotlin.reflect.KProperty1
-import kotlin.reflect.KVisibility
+import kotlin.reflect.*
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.reflect
@@ -83,6 +80,10 @@ fun getClassFromPath(kClass: KClass<*>, propPath: String): KClass<*>?{
 
 }
 
+fun getPropertyClass(property: KProperty<*>): KClass<*> {
+    return property.getter.returnType.classifier as KClass<*>
+}
+
 fun getPropertyClass(klass: KClass<*>, propName: String): KClass<*> {
 
     val property = klass.memberProperties.find { it.name == propName }
@@ -92,8 +93,23 @@ fun getPropertyClass(klass: KClass<*>, propName: String): KClass<*> {
     return Any::class
 }
 
+fun getClassProperty(klass: KClass<*>, propName: String): KProperty<*>?{
+    return klass.memberProperties.find { it.name == propName }
+}
+
+
 fun getPropertyType(instance: Any, propName: String): TypeKind{
     val klass = getPropertyClass(instance::class, propName)
+
+
+    val result = classToTypeKind(klass)
+    /*if (result == TypeKind.UNKNOWN)
+        println("unhandled typeKind :${klass.qualifiedName}")*/
+    return result
+}
+
+fun getPropertyType(property: KProperty<*>): TypeKind{
+    val klass = property.getter.returnType.classifier as KClass<*>
 
 
     val result = classToTypeKind(klass)
@@ -112,10 +128,22 @@ fun getPropertyInheritsFrom(instance: Any, propName: String, klass: KClass<*>): 
     return getPropertyInheritsFrom(instance::class, propName, klass)
 }
 
+fun getPropertyInheritsFrom(property: KProperty<*>, klass: KClass<*>): Boolean {
+    return (property.getter.returnType.classifier as KClass<*>).isSubclassOf(klass)
+}
+
 fun getPropertyInheritsFrom(typeClass: KClass<*>, propName: String, propKlass: KClass<*>): Boolean{
     val theProp = getPropertyClass(typeClass, propName)
     return theProp == propKlass || theProp.superclasses.contains(propKlass) && theProp != Any::class
 
+}
+
+fun <T: Any>getObjectPropertyProp(instance: Any, property: KProperty<*>): T?{
+    if (property.visibility == KVisibility.PUBLIC) {
+        val result = property.call(instance)
+        return (if (result != null) result as T else null)
+    }
+    return null
 }
 
 fun <T: Any>getObjectProperty(instance: Any, propName: String): T?{
@@ -134,6 +162,11 @@ fun <T>setObjectProperty(instance: Any, propName: String, value: T){
     if (property != null && /*property.isAccessible &&*/ property.visibility == KVisibility.PUBLIC && property is KMutableProperty<*>)
         property.setter.call(instance, value)
 }
+
+fun <T>setObjectProperty(instance: Any, property: KMutableProperty<*>, value: T){
+        property.setter.call(instance, value)
+}
+
 fun isPublishedProp(kClass: KClass<*>, propName: String): Boolean{
     //kClass.memberProperties.forEach { println("popr: ${it.name}") }
     val property = kClass.memberProperties.find { it.name.equals(propName) }
@@ -142,6 +175,10 @@ fun isPublishedProp(kClass: KClass<*>, propName: String): Boolean{
     return property.findAnnotation<Published>() != null
     //return property.visibility == KVisibility.PUBLIC
 
+}
+
+fun isPublishedProp(property: KProperty<*>): Boolean{
+    return property.findAnnotation<Published>() != null
 }
 
 fun isPublicProp(instance: Any, propName: String): Boolean{

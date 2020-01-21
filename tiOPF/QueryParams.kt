@@ -2,6 +2,7 @@ package tiOPF
 
 import java.util.*
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
 import kotlin.reflect.full.primaryConstructor
 
 open class QueryParams: ObjectList<QueryParamAbs>() {
@@ -145,44 +146,48 @@ open class QueryParams: ObjectList<QueryParamAbs>() {
         data.value = queryData.copyOf()
     }
 
-    fun setValueFromProp(fieldMetadata: Object, propName: String, paramName: String){
+    /*fun setValueFromProp(fieldMetadata: Object, propName: String, paramName: String){
+        val property = getClassProperty(fieldMetadata::class, propName)
+        setValueFromProp(fieldMetadata, property!!, paramName)
+    }*/
+
+    fun setValueFromProp(fieldMetadata: Object, property: KProperty<*>, paramName: String){
         assert(fieldMetadata is Object, { CTIErrorInvalidObject })
-        assert(propName.isNotEmpty(), { "propName is not assigned"})
         assert(paramName.isNotEmpty(), { "paramName is not assigned"})
-        assert(isPublishedProp(fieldMetadata::class, propName), { "$propName is not a published property on ${fieldMetadata.className()}"})
+        assert(isPublishedProp(property), { "$property is not a published property on ${fieldMetadata.className()}"})
         try {
-            when (classToTypeKind(getPropertyClass(fieldMetadata::class, propName))){
+            when (classToTypeKind(getPropertyClass(property))){
                 TypeKind.STRING -> {
-                    val value = getObjectProperty<String>(fieldMetadata, propName)
+                    val value = getObjectPropertyProp<String>(fieldMetadata, property)
                     setValueAsString(paramName, value!!)
                 }
                 TypeKind.INT -> {
-                    val value = getObjectProperty<Number>(fieldMetadata, propName)
+                    val value = getObjectPropertyProp<Number>(fieldMetadata, property)
                     setValueAsInteger(paramName, value!!.toLong())
                 }
                 TypeKind.FLOAT -> {
-                    val value = getObjectProperty<Number>(fieldMetadata, propName)
+                    val value = getObjectPropertyProp<Number>(fieldMetadata, property)
                     setValueAsFloat(paramName, value!!.toDouble())
                 }
                 TypeKind.DATE -> {
-                    val value = getObjectProperty<Date>(fieldMetadata, propName)
+                    val value = getObjectPropertyProp<Date>(fieldMetadata, property)
                     setValueAsDateTime(paramName, value!!)
                 }
                 TypeKind.BOOLEAN -> {
-                    val value = getObjectProperty<Boolean>(fieldMetadata, propName)
+                    val value = getObjectPropertyProp<Boolean>(fieldMetadata, property)
                     setValueAsBoolean(paramName, value!!)
                 }
                 TypeKind.BYTE_ARRAY -> {
-                    val value = getObjectProperty<ByteArray>(fieldMetadata, propName)
+                    val value = getObjectPropertyProp<ByteArray>(fieldMetadata, property)
                     setValueAsByteArray(paramName, value!!)
                 }
                 else ->
-                    if (propName != "oid")
+                    if (property.name != "oid")
                         throw EtiOPFProgrammerException(CErrorInvalidTypeKind)
             }
         }
         catch (e: EtiOPFProgrammerException){
-            throw EtiOPFProgrammerException(CErrorSettingPropValue.format(propName, fieldMetadata.className(), e.message))
+            throw EtiOPFProgrammerException(CErrorSettingPropValue.format(property.name, fieldMetadata.className(), e.message))
 
         }
 

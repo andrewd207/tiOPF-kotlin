@@ -1,6 +1,8 @@
 package tiOPF
 
 import java.util.*
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.primaryConstructor
@@ -315,6 +317,10 @@ open class Object(): Visited(), IObject<Object> {
 
     open fun isReadWriteProp(propName: String): Boolean{
         return propName.equals("OID", true) || isReadWriteProp(this, propName)
+    }
+
+    open fun isReadWriteProp(property: KProperty<*>): Boolean{
+        return property.name.equals("OID", true) || property is KMutableProperty<*>
     }
 
     override fun clone(): Object{

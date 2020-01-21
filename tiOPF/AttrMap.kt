@@ -1,4 +1,7 @@
 package tiOPF
+
+import kotlin.reflect.KMutableProperty
+
 // complete
 class AttrMap: Object() {
     var attrName: String = ""
@@ -6,5 +9,5 @@ class AttrMap: Object() {
         get() = attrName
         set(value) { attrName = value}
     val ownerAsClassMap: ClassMap get () = owner as ClassMap
-
+    lateinit var property: KMutableProperty<*>
 }

@@ -3,6 +3,7 @@ package tiOPF
 import tiOPF.Log.LOG
 import tiOPF.Log.LogSeverity
 import kotlin.reflect.KClass
+import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.findAnnotation
 
 class ClassDBMappingManager: Object() {
@@ -18,26 +19,17 @@ class ClassDBMappingManager: Object() {
         val classMap = classMaps.findCreate(kClass)
         val attrMap = classMap.addAttrMap(attrName)
         attrMap.objectState = PerObjectState.Clean
+        attrMap.property = getClassProperty(kClass, attrName) as KMutableProperty<*>
         attrColMaps.addMapping(attrMap, dbColMap)
     }
-    fun registerMapping(kClass: KClass<*>, tableName: String? = null, oidField: String = ""){
-        var table = ""
-        val published = kClass.findAnnotation<PublishedClass>()
+    fun registerMapping(kClass: KClass<*>, tableName: String? = null, oidField: String? = null){
+        val published = kClass.findAnnotation<Published>()
+        val publishedClass = kClass.findAnnotation<PublishedClass>()
 
-        table = if (tableName.isNullOrEmpty()) {
-            if (published == null || published.persistenceHint.isEmpty())
-                throw Exception("Neither tableName or class annotation Published(\"tableName\") is set for ${kClass.simpleName}")
-            published.persistenceHint
-        } else
-            tableName
+        val table = (tableName?: publishedClass?.persistenceHint?: published?.persistenceHint?:
+            throw Exception("Neither tableName or class annotations Published/PublishedClass(tableName) is set for ${kClass.simpleName}"))
 
-        val oidValue =(
-                if (oidField.isNotEmpty())
-                    oidField
-                else if (published == null || published.oidField.isEmpty())
-                    "OID"
-                else
-                    published.oidField)
+        val oidValue = (oidField?: publishedClass?.oidField?: "OID")
 
         val propList = mutableListOf<String>()
         val fieldList = mutableListOf<String>()
@@ -46,7 +38,11 @@ class ClassDBMappingManager: Object() {
         registerMapping(kClass, table, "oid", oidValue, setOf(ClassDBMapRelationshipType.Primary))
         propList.forEachIndexed { index, propName ->
             if (fieldList[index].isEmpty()){
-                LOG("Skipping adding auto-mapping for ${kClass.simpleName}.$propName because Published is empty", LogSeverity.Visitor)
+                if (propName != "caption") {
+                    val fieldName = propName.toUpperCase()
+                    LOG("Auto-map is using $fieldName for ${kClass.simpleName}.$propName because @Published(field) is empty", LogSeverity.Warning)
+                    registerMapping(kClass, table, propName, fieldName, emptySet())
+                }
             }
             else {
                 registerMapping(kClass, table, propName, fieldList[index], emptySet())
