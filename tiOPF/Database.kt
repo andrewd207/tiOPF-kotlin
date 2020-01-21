@@ -74,7 +74,7 @@ abstract class Database: BaseObject() {
     }
     fun dropTable(tableName: String){
         val dbMetadataTable = DBMetadataTable()
-        dbMetadataTable.name
+        dbMetadataTable.name = tableName
         dropTable(dbMetadataTable)
 
     }

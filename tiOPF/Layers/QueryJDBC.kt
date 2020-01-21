@@ -561,13 +561,13 @@ interface IDatabaseJDBCCompanion: IDatabaseCompanion {
     override fun dropDatabase(databaseName: String, userName: String, password: String, params: String) {
         val props = Properties()
         val connection =
-            DatabaseJDBC.connect("jdbc:${DatabaseJDBC.getDriverName()}://$databaseName", userName, password, props)
+            connect("jdbc:${getDriverName()}://$databaseName", userName, password, props)
         if (connection != null)
             connection.use { connection ->
                 val statement = connection?.createStatement()
                 if (statement != null) {
                     val sql = "DROP DATABASE $databaseName"
-                    statement.executeUpdate(sql)
+                    statement.execute(sql)
                 }
             }
     }

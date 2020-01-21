@@ -35,6 +35,14 @@ class DatabaseSqlite: DatabaseJDBC(){
             return "jdbc:sqlite:"
         }
 
+        override fun dropDatabase(databaseName: String, userName: String, password: String, params: String) {
+            val file = File(databaseName)
+            if (file.exists())
+                file.delete()
+        }
+
+
+
         override fun createInstance(): Database {
             return DatabaseSqlite()
         }
