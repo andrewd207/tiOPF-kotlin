@@ -1,5 +1,11 @@
-package tiOPF
+package tiOPF.tiOPF.automap
 // complete
+import tiOPF.*
+import tiOPF.List
+import tiOPF.automap.AttrColMap
+import tiOPF.automap.AttrColMaps
+import tiOPF.automap.ClassDBCollection
+import tiOPF.automap.ClassMaps
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.isSubclassOf
@@ -70,8 +76,14 @@ abstract class VisAutoAbs: ObjectVisitor() {
                 target.oid.assignFromQuery(colName, query!!)
             }
 
-            if (getPropertyInheritsFrom(target, property.name, OID::class)){
-                val lOID = getObjectPropertyProp<OID>(target, property)
+            if (getPropertyInheritsFrom(
+                    target,
+                    property.name,
+                    OID::class
+                )
+            ){
+                val lOID =
+                    getObjectPropertyProp<OID>(target, property)
                 if (lOID != null){
                     lOID.assignFromQuery(colName, query!!)
                     return
@@ -90,13 +102,33 @@ abstract class VisAutoAbs: ObjectVisitor() {
                     }
                     Query.QueryFieldKind.Integer -> {
                         when (getPropertyType(property)) {
-                            TypeKind.LONG -> setObjectProperty(target, property, query!!.getFieldAsInteger(colName))
-                            TypeKind.INT -> setObjectProperty(target, property, query!!.getFieldAsInteger(colName).toInt())
+                            TypeKind.LONG -> setObjectProperty(
+                                target,
+                                property,
+                                query!!.getFieldAsInteger(colName)
+                            )
+                            TypeKind.INT -> setObjectProperty(
+                                target,
+                                property,
+                                query!!.getFieldAsInteger(colName).toInt()
+                            )
                         }
                     }
-                    Query.QueryFieldKind.Float ->  setObjectProperty(target, property, query!!.getFieldAsFloat(colName))
-                    Query.QueryFieldKind.DateTime ->  setObjectProperty(target, property, query!!.getFieldAsDate(colName))
-                    Query.QueryFieldKind.Logical ->  setObjectProperty(target, property, query!!.getFieldAsBoolean(colName))
+                    Query.QueryFieldKind.Float -> setObjectProperty(
+                        target,
+                        property,
+                        query!!.getFieldAsFloat(colName)
+                    )
+                    Query.QueryFieldKind.DateTime -> setObjectProperty(
+                        target,
+                        property,
+                        query!!.getFieldAsDate(colName)
+                    )
+                    Query.QueryFieldKind.Logical -> setObjectProperty(
+                        target,
+                        property,
+                        query!!.getFieldAsBoolean(colName)
+                    )
                     Query.QueryFieldKind.Binary -> {
                         val value = ValueOut<ByteArray>()
                         query!!.assignFieldAsByteArray(colName, value)
@@ -135,7 +167,10 @@ open class VisAutoReadThis: VisAutoAbs(){
     override fun acceptVisitor(): Boolean {
         if (visited != null) {
             val kClass: KClass<*> = visited!!::class
-            return visited!!.objectState in setOf(Object.PerObjectState.Empty, Object.PerObjectState.PK)
+            return visited!!.objectState in setOf(
+                Object.PerObjectState.Empty,
+                Object.PerObjectState.PK
+            )
                 && GTIOPFManager().classDBMappingManager.classMaps.isClassRegistered(kClass as KClass<Object>)
         }
         return false
@@ -143,7 +178,10 @@ open class VisAutoReadThis: VisAutoAbs(){
 
     override fun final(visited: Object) {
         if (setObjectState) {
-            assert(visited.objectState in arrayOf(Object.PerObjectState.Empty, Object.PerObjectState.PK),
+            assert(visited.objectState in arrayOf(
+                Object.PerObjectState.Empty,
+                Object.PerObjectState.PK
+            ),
                 {"Object state on " + visited.className() + " not Empty or PK it's "+visited.objectState.toString()})
             if (GTIOPFManager().classDBMappingManager.collections.isCollection(visited::class))
                 visited.objectState = Object.PerObjectState.PK
@@ -318,7 +356,10 @@ open class VisAutoCollectionRead: VisAutoAbs() {
 
     override fun acceptVisitor(): Boolean {
         if (visited != null) {
-            return (visited!!.objectState in arrayOf(Object.PerObjectState.Empty, Object.PerObjectState.PK))
+            return (visited!!.objectState in arrayOf(
+                Object.PerObjectState.Empty,
+                Object.PerObjectState.PK
+            ))
                     && GTIOPFManager().classDBMappingManager.collections.isCollection(visited!!::class)
         }
         return false
@@ -459,7 +500,8 @@ class VisAutoDelete: VisAutoUpdateAbs(){
     override fun doExecuteQuery() {
         query!!.deleteRow(whereAttrColMaps.tableName(), where)
     }
-    init { iterationStyle = IterationStyle.isBottomUpSinglePass }
+    init { iterationStyle = IterationStyle.isBottomUpSinglePass
+    }
 
 }
 
@@ -472,7 +514,8 @@ class VisAutoUpdate: VisAutoUpdateAbs(){
     override fun doExecuteQuery() {
         query!!.updateRow(whereAttrColMaps.tableName(), params, where)
     }
-    init { iterationStyle = IterationStyle.isBottomUpSinglePass }
+    init { iterationStyle = IterationStyle.isBottomUpSinglePass
+    }
 }
 
 class VisAutoCreate: VisAutoUpdateAbs(){

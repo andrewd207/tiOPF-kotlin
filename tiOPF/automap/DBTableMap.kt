@@ -1,5 +1,9 @@
-package tiOPF
+package tiOPF.automap
 // complete
+import tiOPF.ObjectList
+import tiOPF.tiOPF.automap.DBColMap
+import tiOPF.tiOPF.automap.PKInfo
+
 class DBTableMap: ObjectList<DBColMap>() {
     val ownerAsDBColMap: DBColMap get () = owner as DBColMap
     var tableName = ""
@@ -12,7 +16,7 @@ class DBTableMap: ObjectList<DBColMap>() {
         }
         return null
     }
-    fun addColMap(colName: String, pkInfo: PKInfo): DBColMap{
+    fun addColMap(colName: String, pkInfo: PKInfo): DBColMap {
         var result = findByColName(colName)
         if (result != null)
             return result

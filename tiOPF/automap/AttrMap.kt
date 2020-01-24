@@ -1,6 +1,7 @@
-package tiOPF
+package tiOPF.automap
 
 import kotlin.reflect.KMutableProperty
+import tiOPF.Object
 
 // complete
 class AttrMap: Object() {

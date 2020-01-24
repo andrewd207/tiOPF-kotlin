@@ -1,5 +1,6 @@
-package tiOPF
+package tiOPF.automap
 
+import tiOPF.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
@@ -10,7 +11,7 @@ class ClassMap: ObjectList<AttrMap>() {
     }
     val ownerAsClassDBMappingManager: ClassDBMappingManager get() = owner as ClassDBMappingManager
     private fun isPublishedProp(propName: String): Boolean{
-        return isPublicProp(propName) || isPublishedProp(perObjAbsClass!!, propName)
+        return isPublicProp(propName) || tiOPF.isPublishedProp(perObjAbsClass!!, propName)
     }
     override val caption: String get() { return perObjAbsClass!!.qualifiedName!! }
 

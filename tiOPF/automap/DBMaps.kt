@@ -1,6 +1,7 @@
-package tiOPF
+package tiOPF.automap
 // complete
-import java.lang.Exception
+import tiOPF.ObjectList
+import tiOPF.className
 
 class DBMaps: ObjectList<DBMap>() {
     val ownerAsClassDBMappingManager: ClassDBMappingManager get() = owner as ClassDBMappingManager

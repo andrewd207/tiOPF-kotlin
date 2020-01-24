@@ -1,4 +1,4 @@
-package tiOPF.Layers
+package tiOPF.layers
 
 import org.firebirdsql.gds.impl.GDSFactory
 import org.firebirdsql.management.FBManager

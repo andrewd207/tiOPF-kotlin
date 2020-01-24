@@ -1,5 +1,8 @@
-package tiOPF
+package tiOPF.automap
 //complete
+import tiOPF.ObjectList
+import tiOPF.PerObjectList
+import tiOPF.List
 import kotlin.reflect.KClass
 
 class ClassDBCollections: ObjectList<ClassDBCollection>() {

@@ -1,7 +1,11 @@
-package tiOPF
+package tiOPF.automap
 // complete
+import tiOPF.*
+import tiOPF.Object
 import tiOPF.Log.LOG
 import tiOPF.Log.LogSeverity
+import tiOPF.tiOPF.automap.ClassDBMapRelationshipType
+import tiOPF.tiOPF.automap.PKInfo
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.findAnnotation
@@ -18,7 +22,7 @@ class ClassDBMappingManager: Object() {
 
         val classMap = classMaps.findCreate(kClass)
         val attrMap = classMap.addAttrMap(attrName)
-        attrMap.objectState = PerObjectState.Clean
+        attrMap.objectState = tiOPF.Object.PerObjectState.Clean
         attrMap.property = getClassProperty(kClass, attrName) as KMutableProperty<*>
         attrColMaps.addMapping(attrMap, dbColMap)
     }
@@ -58,7 +62,7 @@ class ClassDBMappingManager: Object() {
     fun registerCollection(collectionClass: KClass<PerObjectList>, collectionOfClass: KClass<*>){
         collections.addClassCollectionMapping(collectionClass, collectionOfClass)
     }
-    fun registerInheritance(parentClass: KClass<Object>, childClass: KClass<Object>){
+    fun registerInheritanceList(parentClass: KClass<Object>, childClass: KClass<Object>){
         classMaps.registerInheritance(parentClass, childClass)    }
     init {
         attrColMaps.owner = this

@@ -1,5 +1,7 @@
 package tiOPF
 // complete
+import tiOPF.automap.AttrColMaps
+import tiOPF.automap.VisProAttributeToFieldName
 import kotlin.reflect.KClass
 
 enum class CriteriaType{

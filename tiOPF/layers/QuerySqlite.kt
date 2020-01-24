@@ -1,4 +1,4 @@
-package tiOPF.Layers
+package tiOPF.layers
 
 import tiOPF.*
 import tiOPF.Log.LOG

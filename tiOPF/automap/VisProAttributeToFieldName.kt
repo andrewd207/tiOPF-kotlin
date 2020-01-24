@@ -1,5 +1,8 @@
-package tiOPF
+package tiOPF.automap
 // complete
+import tiOPF.SelectionCriteriaAbs
+import tiOPF.Visited
+import tiOPF.Visitor
 import kotlin.reflect.KClass
 
 class VisProAttributeToFieldName(private val attrColMaps: AttrColMaps, private val classType: KClass<*>): Visitor() {

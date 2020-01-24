@@ -1,5 +1,7 @@
 package tiOPF
 
+import tiOPF.automap.*
+import tiOPF.tiOPF.automap.*
 import java.time.ZonedDateTime
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.reflect.KClass

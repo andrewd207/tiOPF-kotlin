@@ -1,4 +1,8 @@
-package tiOPF
+package tiOPF.tiOPF.automap
+
+import tiOPF.Object
+import tiOPF.automap.DBTableMap
+
 // complete
 enum class ClassDBMapRelationshipType {
     Invalid,

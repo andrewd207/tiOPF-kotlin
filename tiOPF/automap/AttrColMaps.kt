@@ -1,5 +1,10 @@
-package tiOPF
+package tiOPF.automap
 // complete
+import tiOPF.CErrorInconsistentTableNames
+import tiOPF.EtiOPFProgrammerException
+import tiOPF.ObjectList
+import tiOPF.tiOPF.automap.ClassDBMapRelationshipType
+import tiOPF.tiOPF.automap.DBColMap
 import kotlin.reflect.KClass
 
 class AttrColMaps: ObjectList<AttrColMap>() {
@@ -19,7 +24,8 @@ class AttrColMaps: ObjectList<AttrColMap>() {
     fun findAllPKMappingsByMapToClass(klass: KClass<*>, list: AttrColMaps){
         list.clear()
         forEach {
-            if (it.attrMap.ownerAsClassMap.perObjAbsClass == klass && it.dbColMap.pkInfo.contains(ClassDBMapRelationshipType.Primary))
+            if (it.attrMap.ownerAsClassMap.perObjAbsClass == klass && it.dbColMap.pkInfo.contains(
+                    ClassDBMapRelationshipType.Primary))
                 list.add(it)
         }
     }
