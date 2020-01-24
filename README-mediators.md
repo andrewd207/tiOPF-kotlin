@@ -1,4 +1,4 @@
-#Mediators
+# Mediators
 
 So far, some mediators for JavaFX widgets are implemented. Text Widgets, ComboBoxes, Lists, Trees, etc. See the 
 javaFXMediators folder.
@@ -26,7 +26,7 @@ Now changing the value in the GUI will automatically update the object. You can 
 ## More complicated mediators
 
 ### TableViews
-TableViews have column several columns which complicates the fieldName somewhat.
+TableViews have several columns which complicates the fieldName somewhat.
 
 Imagine you have a list of Foo, a mediator, and a TableView.
 ~~~

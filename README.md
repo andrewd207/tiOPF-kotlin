@@ -14,8 +14,8 @@ Use the @Published annotation on the properties you want to make available to ti
 ~~~
 // Object is defined in tiOPF.Object
 class Foo: Object(){
-    @Published var name = ""         
-    @Published var age = 1
+    @Published("C_NAME") var name = ""         
+    @Published("C_AGE") var age = 1
 }
 ....
 
@@ -23,8 +23,8 @@ val foo = Foo()
 foo.name = "Alexander the Great"
 foo.age = 36
 ~~~
-*Note: @Published has an optional parameter which is intended to automatically map properties to a table column in a 
-database but is not implemented yet.*
+*Note: **@Published** has an optional parameter which is used to automatically map properties to a table column in a 
+database when using [automap](./README-automap.md), if you don't assign it the uppercase property name will be used.*
 
 Save an object to a persistence layer that has been setup.
 

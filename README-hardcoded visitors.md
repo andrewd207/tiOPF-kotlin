@@ -93,5 +93,5 @@ class FooObjectList<FooObject>{
 Yes. It also comes with the benefit/drawback of extreme flexibility.
 
 There exists a program "mapper" mentioned in the main [README](./README.md) that I am currently working on creating a Kotlin version of.
-You define your objects in xml and it generates all this code for you. As an alternative, I think it also may be 
-relatively easy to generate this generic sql using tiOPF's AutoMap. Famous last words? :/
+You define your objects in xml and it generates all this code for you. [Automap](./README-automap.md) is a solution
+that may be suitable for your needs and does not use these hard coded visitors - at the cost of being a little slower.
